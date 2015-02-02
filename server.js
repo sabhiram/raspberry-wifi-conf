@@ -3,7 +3,10 @@ var _                   = require("underscore")._,
 
     util                = require("util"),
     fs                  = require("fs"),
-    path                = require("path");
+    path                = require("path"),
+
+    iwlist              = require("./iwlist"),
+    wifi_manager        = require("./wifi_manager")();
 
 /*****************************************************************************\
     1. Check to see if we are connected to a wifi AP
@@ -19,4 +22,12 @@ var _                   = require("underscore")._,
     6. At this stage, the RPI is named, and has a valid wifi connection which
        its bound to, reboot the pi and re-run this script on startup.
 \*****************************************************************************/
+iwlist(function(error, result) {
+    console.log(util.inspect(result, { depth: null }));
+});
+
+wifi_manager.get_wifi_info(function(error, result) {
+   console.log(util.inspect(result, { depth: null }));
+});
+
 

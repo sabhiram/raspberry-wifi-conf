@@ -1,4 +1,4 @@
-# rpi-connect-to-wifi
+# raspberry-wifi-conf
 
 A Node application which makes connecting your RaspberryPi to your home wifi easier
 
@@ -9,6 +9,17 @@ When unable to connect to a wifi network, this service will turn the RPI into a 
 Once configured, it prompts the PI to reboot with the appropriate wifi credentials. If this process fails, it immediately re-enables the PI as an AP which can be configurable again.
 
 ## Install
+
+#### Pre-requisites:
+
+Install hostapd and isc-dhcp-server:
+
+```sh
+$sudo apt-get update
+$sudo apt-get install hostapd isc-dhcp-server
+```
+
+#### Fetch raspberry-wifi-conf
 
 ```sh
 $git clone git@github.com:sabhiram/rpi-connect-to-wifi.git

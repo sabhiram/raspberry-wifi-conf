@@ -22,12 +22,69 @@ var _                   = require("underscore")._,
     6. At this stage, the RPI is named, and has a valid wifi connection which
        its bound to, reboot the pi and re-run this script on startup.
 \*****************************************************************************/
-iwlist(function(error, result) {
-    console.log(util.inspect(result, { depth: null }));
+
+async.series([
+    // 1. Check if wifi is enabled / connected
+    function test_is_wifi_enabled(next_step) {
+        wifi_manager.is_wifi_enabled(function(error, result_ip) {
+            if (result_ip != "<unknown>") {
+                console.log("Wifi is enabled, and IP " + result_ip + " assigned");
+                process.exit(0);
+            } else {
+                console.log("Wifi is not enabled!");
+            }
+            next_step(error);
+        });
+    },
+
+    // 2. Turn RPI into an access point
+    function enable_rpi_ap(next_step) {
+        wifi_manager.enable_ap_mode("ottoQ-router", next_step);
+    },
+
+    // 3. Host HTTP server while functioning as AP
+
+    // 4+ - Config steps will be done as a result of REST calls made later
+
+], function(error) {
+    console.log("Done!!");
 });
 
-wifi_manager.get_wifi_info(function(error, result) {
-   console.log(util.inspect(result, { depth: null }));
+
+
+
+
+
+/*
+
+async.series([
+    function check_wifi_connection(next_step) {
+        iwlist(function(error, result) {
+            console.log(util.inspect(result, { depth: null }));
+            next_step(error);
+        });
+    },
+
+    function test_get_wifi_info(next_step) {
+        wifi_manager.get_wifi_info(function(error, result) {
+           console.log(util.inspect(result, { depth: null }));
+           next_step(error);
+        });
+    },
+
+    function test_is_wifi_enabled(next_step) {
+        wifi_manager.is_wifi_enabled(function(error, result) {
+            if (result) {
+                console.log("Wifi is enabled!");
+            } else {
+                console.log("Wifi is not enabled!");
+            }
+            next_step(error);
+        });
+    },
+], function(error) {
+    console.log("Done!!");
 });
 
+*/
 

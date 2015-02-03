@@ -1,0 +1,22 @@
+{
+    "wifi_interface": "wlan0",
+
+    "access_point": {
+        "wifi_interface":    "wlan0",
+        "ssid":              "rpi-config-ap",
+        "passphrase":        "zzzzzzzz",
+        "domain":            "rpi.config",
+        "ip_addr":           "192.168.44.1",
+        "netmask":           "255.255.255.0",
+        "subnet_ip":         "192.168.44.0",
+        "broadcast_address": "192.168.44.255",
+        "subnet_range": {
+            "start":         "192.168.44.10",
+            "end":           "192.168.44.50"
+        }
+    },
+
+    "server": {
+        "port": 88
+    }
+}

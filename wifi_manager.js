@@ -1,7 +1,32 @@
 var _       = require("underscore")._,
     async   = require("async"),
+    fs      = require("fs"),
     exec    = require("child_process").exec,
-    util    = require("util");
+    util    = require("util"),
+    config  = require("./config.json");
+
+// Better template format
+_.templateSettings = {
+    interpolate: /\{\{(.+?)\}\}/g,
+    evaluate :   /\{\[([\s\S]+?)\]\}/g
+};
+
+// Helper function to write a given template to a file based on a given
+// context
+function write_template_to_file(template_path, file_name, context, callback) {
+    async.waterfall([
+
+        function read_template_file(next_step) {
+            fs.readFile(template_path, {encoding: "utf8"}, next_step);
+        },
+
+        function update_file(file_txt, next_step) {
+            var template = _.template(file_txt);
+            fs.writeFile(file_name, template(context), next_step);
+        }
+
+    ], callback);
+}
 
 /*****************************************************************************\
     Return a set of functions which we can use to manage and check our wifi
@@ -22,7 +47,7 @@ module.exports = function() {
 
     // TODO: rpi-config-ap hardcoded, should derive from a constant
 
-    // Define a bunch of functions...
+    // Get generic info on an interface
     var _get_wifi_info = function(callback) {
         var output = {
             hw_addr: "<unknown>",
@@ -58,76 +83,126 @@ module.exports = function() {
         });
     },
 
-    _is_ap_enabled = function(callback) {
-        // Being invoked async'ly - so get the data
-        // and return the appropriate condition
-        if (typeof(callback) == "function") {
-            _get_wifi_info(function(error, result) {
-                if (error) return callback(error, null);
-                // If the hw_addr matches the ap_addr
-                // and the ap_ssid matches "rpi-config-ap"
-                // then we are in AP mode
-                var is_ap =
-                    result["hw_addr"].toLowerCase() == result["ap_addr"].toLowerCase() &&
-                    result["ap_ssid"] == "rpi-config-ap",
-                    output = (is_ap) ? result["hw_addr"].toLowerCase() : null;
-                return callback(null, output);
-            });
+    // Wifi related functions
+    _is_wifi_enabled_sync = function(info) {
+        if (!_is_ap_enabled_sync(info) &&
+            info["inet_addr"] != "<unknown>") {
+            return info["inet_addr"];
         }
-        // Being invoked by value, we have already computed result
-        else {
-            var result = callback,
-                is_ap  =
-                    result["hw_addr"].toLowerCase() == result["ap_addr"].toLowerCase() &&
-                    result["ap_ssid"] == "rpi-config-ap";
-                return (is_ap) ? result["hw_addr"].toLowerCase() : null;
-        }
+        return null;
     },
 
     _is_wifi_enabled = function(callback) {
-        // Being invoked async'ly - so get the data
-        // and return the appropriate condition
-        if (typeof(callback) == "function") {
-            _get_wifi_info(function(error, result) {
-                if (error) return callback(error, null);
-                // If we are not an AP, and we have a valid
-                // inet_addr - wifi is enabled!
-                var ap_enabled_addr = _is_ap_enabled(result);
-                if (ap_enabled_addr == null && result["inet_addr"] != "<unknown>") {
-                    return callback(null, result["inet_addr"]);
-                }
-                return callback(null, null);
-            });
-        }
-        // Being invoked by value, we have already computed result
-        else {
-            var result = callback;
-
-            if (!_is_ap_enabled(result) && result["inet_addr"] != "<unknown>") {
-                return result["inet_addr"];
+        _get_wifi_info(function(error, info) {
+            if (error) return callback(error, null);
+            // If we are not an AP, and we have a valid
+            // inet_addr - wifi is enabled!
+            var ap_enabled_addr = _is_ap_enabled_sync(info);
+            if (ap_enabled_addr == null && info["inet_addr"] != "<unknown>") {
+                return callback(null, info["inet_addr"]);
             }
-            return null;
-        }
+            return callback(null, null);
+        });
     },
 
-    _enable_ap_mode = function(bcast_ssid, callback) {
-        console.log("_enable_ap_mode invoked...");
+    // Access Point related functions
+    _is_ap_enabled_sync = function(info) {
+        is_ap  =
+            info["hw_addr"].toLowerCase() == info["ap_addr"].toLowerCase() &&
+            info["ap_ssid"] == "rpi-config-ap";
+        return (is_ap) ? info["hw_addr"].toLowerCase() : null;
+    },
 
-        _is_ap_enabled(function(error, result_addr) {
-            if (result_addr && !error) {
-                console.log("Access point is enabled with ADDR: " + result_addr);
-            } else if (!error) {
-                console.log("Access point is not enabled");
-            }
-            return callback(error);
+    _is_ap_enabled = function(callback) {
+        _get_wifi_info(function(error, info) {
+            if (error) return callback(error, null);
+            // If the hw_addr matches the ap_addr
+            // and the ap_ssid matches "rpi-config-ap"
+            // then we are in AP mode
+            var is_ap =
+                info["hw_addr"].toLowerCase() == info["ap_addr"].toLowerCase() &&
+                info["ap_ssid"] == "rpi-config-ap",
+                output = (is_ap) ? info["hw_addr"].toLowerCase() : null;
+            return callback(null, output);
         });
+    },
+
+    // Enables the accesspoint w/ bcast_ssid. This assumes that both
+    // isc-dhcp-server and hostapd are installed using:
+    // $sudo npm run-script provision
+    _enable_ap_mode = function(bcast_ssid, callback) {
+        _is_ap_enabled(function(error, result_addr) {
+            if (error) return callback(error);
+
+            if (result_addr) {
+                console.log("Access point is enabled with ADDR: " + result_addr);
+                //return callback(null);
+            }
+
+            var context = config.access_point;
+            context["enable_ap"] = true;
+
+            // Here we need to actually follow the steps to enable the ap
+            async.series([
+
+                // Enable the access point ip and netmask + static
+                // DHCP for the wlan0 interface
+                function update_interfaces(next_step) {
+                    write_template_to_file(
+                        "./assets/etc/network/interfaces.ap.template",
+                        "/etc/network/interfaces",
+                        context, next_step);
+                },
+
+                // Enable DHCP conf, set authoritative mode and subnet
+                function update_dhcpd(next_step) {
+                    var context = config.access_point;
+                    // We must enable this to turn on the access point
+
+
+                    write_template_to_file(
+                        "./assets/etc/dhcp/dhcpd.conf.template",
+                        "/etc/dhcp/dhcpd.conf",
+                        context, next_step);
+                },
+
+                // Enable the interface in the dhcp server
+                function update_dhcp_interface(next_step) {
+                    write_template_to_file(
+                        "./assets/etc/default/isc-dhcp-server.template",
+                        "/etc/default/isc-dhcp-server",
+                        context, next_step);
+                },
+
+                // Enable hostapd.conf file
+                function update_hostapd(next_step) {
+                    write_template_to_file(
+                        "./assets/etc/hostapd/hostapd.conf.template",
+                        "/etc/hostapd/hostapd.conf",
+                        context, next_step);
+                }
+
+            ], callback);
+        });
+    },
+
+    // Disables AP mode and reverts to wifi connection
+    _disable_ap_mode = function(wifi_connection_info, callback) {
+        console.log("TODO: _disable_ap_mode");
+        callback(null);
     };
 
 
 
     return {
-        get_wifi_info:   _get_wifi_info,
-        is_wifi_enabled: _is_wifi_enabled,
-        enable_ap_mode:  _enable_ap_mode,
+        get_wifi_info:        _get_wifi_info,
+
+        is_wifi_enabled:      _is_wifi_enabled,
+        is_wifi_enabled_sync: _is_wifi_enabled_sync,
+
+        is_ap_enabled:        _is_ap_enabled,
+        is_ap_enabled_sync:   _is_ap_enabled_sync,
+
+        enable_ap_mode:       _enable_ap_mode,
     };
 }

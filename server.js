@@ -4,9 +4,11 @@ var _                   = require("underscore")._,
     util                = require("util"),
     fs                  = require("fs"),
     path                = require("path"),
+    express             = require("express"),
 
     iwlist              = require("./iwlist"),
-    wifi_manager        = require("./wifi_manager")();
+    wifi_manager        = require("./wifi_manager")(),
+    config              = require("./config.json");
 
 /*****************************************************************************\
     1. Check to see if we are connected to a wifi AP
@@ -39,10 +41,23 @@ async.series([
 
     // 2. Turn RPI into an access point
     function enable_rpi_ap(next_step) {
-        wifi_manager.enable_ap_mode("rpi-config-ap", next_step);
+        wifi_manager.enable_ap_mode(config.access_point.ssid, next_step);
     },
 
     // 3. Host HTTP server while functioning as AP
+    function enable_express_server(next_step) {
+        var app = express();
+        app.set("view engine", "ejs");
+        app.set("views", path.join(__dirname, "templates"));
+        app.set("trust proxy", true);
+
+        app.get("/", function(request, response) {
+            response.send("Hello from pi!");
+        });
+
+        app.listen(config.server.port);
+        next_step();
+    },
 
     // 4+ - Config steps will be done as a result of REST calls made later
 

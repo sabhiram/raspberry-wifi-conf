@@ -8,6 +8,8 @@ When unable to connect to a wifi network, this service will turn the RPI into a 
 
 Once configured, it prompts the PI to reboot with the appropriate wifi credentials. If this process fails, it immediately re-enables the PI as an AP which can be configurable again.
 
+This project broadly follows these [instructions](http://www.maketecheasier.com/set-up-raspberry-pi-as-wireless-access-point/) in setting up a RaspberryPi as a wireless AP.
+
 ## Install
 
 #### Pre-requisites:

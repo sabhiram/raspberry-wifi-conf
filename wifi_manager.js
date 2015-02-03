@@ -272,8 +272,6 @@ module.exports = function() {
 
     };
 
-
-
     return {
         get_wifi_info:           _get_wifi_info,
         reboot_wireless_network: _reboot_wireless_network,

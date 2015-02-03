@@ -1,4 +1,5 @@
 var _       = require("underscore")._,
+    async   = require("async"),
     exec    = require("child_process").exec,
     util    = require("util");
 
@@ -10,30 +11,49 @@ module.exports = function() {
 
     // Hack: this just assumes that the outbound interface will be "wlan0"
 
+    // Define some globals
+    var ifconfig_fields = {
+        "hw_addr":         /HWaddr\s([^\s]+)/,
+        "inet_addr":       /inet addr:([^\s]+)/,
+    },  iwconfig_fields = {
+        "ap_addr":         /Access Point:\s([^\s]+)/,
+        "ap_ssid":         /ESSID:\"([^\"]+)\"/,
+    };
+
+    // TODO: ottoQ-config-ap hardcoded, should derive from a constant
+
     // Define a bunch of functions...
-    var
-    _get_wifi_info = function(callback) {
+    var _get_wifi_info = function(callback) {
         var output = {
             hw_addr: "<unknown>",
             inet_addr: "<unknown>",
         };
 
-        exec("ifconfig wlan0", function(error, stdout, stderr) {
-            if (error) {
-                return callback(error, output)
-            }
+        // Inner function which runs a given command and sets a bunch
+        // of fields
+        function run_command_and_set_fields(cmd, fields, callback) {
+            exec(cmd, function(error, stdout, stderr) {
+                if (error) return callback(error);
+                for (var key in fields) {
+                    re = stdout.match(fields[key]);
+                    if (re && re.length > 1) {
+                        output[key] = re[1];
+                    }
+                }
+                callback(null);
+            });
+        }
 
-            var re_hw_addr = stdout.match(/HWaddr\s([^\s]+)/);
-            if (re_hw_addr) {
-                output["hw_addr"] = re_hw_addr[1];
-            }
-
-            var re_inet_addr = stdout.match(/inet addr:([^\s]+)/);
-            if (re_inet_addr) {
-                output["inet_addr"] = re_inet_addr[1];
-            }
-
-            callback(null, output);
+        // Run a bunch of commands and aggregate info
+        async.series([
+            function run_ifconfig(next_step) {
+                run_command_and_set_fields("ifconfig wlan0", ifconfig_fields, next_step);
+            },
+            function run_iwconfig(next_step) {
+                run_command_and_set_fields("iwconfig wlan0", iwconfig_fields, next_step);
+            },
+        ], function(error) {
+            return callback(error, output);
         });
     },
 
@@ -45,6 +65,16 @@ module.exports = function() {
 
     _enable_ap_mode = function(bcast_ssid, callback) {
         console.log("_enable_ap_mode invoked...");
+
+        _is_ap_enabled(function(error, result_addr) {
+            if (result_addr && !error) {
+                console.log("Access point is enabled with ADDR: " + result_addr);
+            } else if (!error) {
+                console.log("Access point is not enabled");
+            }
+
+            callback(error);
+        });
 
         callback(null);
     };

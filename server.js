@@ -58,7 +58,7 @@ async.series([
         app.set("trust proxy", true);
 
         app.get("/", function(request, response) {
-            response.send("Hello from pi!");
+            response.send("<br><br><h1><a href='/enable_wifi'>ENABLE WIFI</a></h1>");
         });
 
         app.get("/enable_wifi", function(request, response) {
@@ -77,7 +77,7 @@ async.series([
                     response.redirect("/");
                 }
                 // Success! - exit
-                consolg.log("Wifi Enabled! - Exiting");
+                console.log("Wifi Enabled! - Exiting");
                 process.exit(0);
             });
         });

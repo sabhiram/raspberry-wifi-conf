@@ -158,8 +158,6 @@ module.exports = function() {
                 function update_dhcpd(next_step) {
                     var context = config.access_point;
                     // We must enable this to turn on the access point
-
-
                     write_template_to_file(
                         "./assets/etc/dhcp/dhcpd.conf.template",
                         "/etc/dhcp/dhcpd.conf",
@@ -175,11 +173,34 @@ module.exports = function() {
                 },
 
                 // Enable hostapd.conf file
-                function update_hostapd(next_step) {
+                function update_hostapd_conf(next_step) {
                     write_template_to_file(
                         "./assets/etc/hostapd/hostapd.conf.template",
                         "/etc/hostapd/hostapd.conf",
                         context, next_step);
+                },
+
+                function update_hostapd_default(next_step) {
+                    write_template_to_file(
+                        "./assets/etc/hostapd/hostapd.template",
+                        "/etc/hostapd/hostapd",
+                        context, next_step);
+                },
+
+                function restart_dhcp_service(next_step) {
+                    exec("service isc-dhcp-server restart", function(error, stdout, stderr) {
+                        console.log(stdout);
+                        if (!error) console.log("dhcp server restarted!");
+                        next_step(error);
+                    });
+                },
+
+                function restart_hostapd_service(next_step) {
+                    exec("service hostapd restart", function(error, stdout, stderr) {
+                        console.log(stdout);
+                        if (!error) console.log("hostapd restarted!");
+                        next_step(error);
+                    });
                 }
 
             ], callback);

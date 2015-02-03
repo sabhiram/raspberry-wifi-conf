@@ -104,6 +104,8 @@ module.exports = function() {
 
     // Wifi related functions
     _is_wifi_enabled_sync = function(info) {
+        // If we are not an AP, and we have a valid
+        // inet_addr - wifi is enabled!
         if (null        == _is_ap_enabled_sync(info) &&
             "<unknown>" != info["inet_addr"]         &&
             "<unknown>" == info["unassociated"] ) {
@@ -115,20 +117,16 @@ module.exports = function() {
     _is_wifi_enabled = function(callback) {
         _get_wifi_info(function(error, info) {
             if (error) return callback(error, null);
-            // If we are not an AP, and we have a valid
-            // inet_addr - wifi is enabled!
-            if (null        == _is_ap_enabled_sync(info) &&
-                "<unknown>" != info["inet_addr"]         &&
-                "<unknown>" == info["unassociated"]) {
-                return callback(null, info["inet_addr"]);
-            }
-            return callback(null, null);
+            return callback(null, _is_wifi_enabled_sync(info));
         });
     },
 
     // Access Point related functions
     _is_ap_enabled_sync = function(info) {
-        is_ap  =
+        // If the hw_addr matches the ap_addr
+        // and the ap_ssid matches "rpi-config-ap"
+        // then we are in AP mode
+        var is_ap  =
             info["hw_addr"].toLowerCase() == info["ap_addr"].toLowerCase() &&
             info["ap_ssid"] == config.access_point.ssid;
         return (is_ap) ? info["hw_addr"].toLowerCase() : null;
@@ -137,14 +135,7 @@ module.exports = function() {
     _is_ap_enabled = function(callback) {
         _get_wifi_info(function(error, info) {
             if (error) return callback(error, null);
-            // If the hw_addr matches the ap_addr
-            // and the ap_ssid matches "rpi-config-ap"
-            // then we are in AP mode
-            var is_ap =
-                info["hw_addr"].toLowerCase() == info["ap_addr"].toLowerCase() &&
-                info["ap_ssid"] == config.access_point.ssid;
-            var output = (is_ap) ? info["hw_addr"].toLowerCase() : null;
-            return callback(null, output);
+            return callback(null, _is_ap_enabled_sync(info));
         });
     },
 

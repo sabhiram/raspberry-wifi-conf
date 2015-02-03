@@ -24,16 +24,15 @@ var _                   = require("underscore")._,
     6. At this stage, the RPI is named, and has a valid wifi connection which
        its bound to, reboot the pi and re-run this script on startup.
 \*****************************************************************************/
-
 async.series([
     // 1. Check if wifi is enabled / connected
     function test_is_wifi_enabled(next_step) {
         wifi_manager.is_wifi_enabled(function(error, result_ip) {
             if (result_ip) {
-                console.log("Wifi is enabled, and IP " + result_ip + " assigned");
+                console.log("\nWifi is enabled, and IP " + result_ip + " assigned");
                 process.exit(0);
             } else {
-                console.log("Wifi is not enabled!");
+                console.log("\nWifi is not enabled, Enable AP for self-configure");
             }
             next_step(error);
         });
@@ -41,7 +40,14 @@ async.series([
 
     // 2. Turn RPI into an access point
     function enable_rpi_ap(next_step) {
-        wifi_manager.enable_ap_mode(config.access_point.ssid, next_step);
+        wifi_manager.enable_ap_mode(config.access_point.ssid, function(error) {
+            if(error) {
+                console.log("... AP Enable ERROR: " + error);
+            } else {
+                console.log("... AP Enable Success!");
+            }
+            next_step(error);
+        });
     },
 
     // 3. Host HTTP server while functioning as AP
@@ -55,11 +61,30 @@ async.series([
             response.send("Hello from pi!");
         });
 
+        app.get("/enable_wifi", function(request, response) {
+            var conn_info = {
+                wifi_ssid:      process.env.SSID,
+                wifi_passcode:  process.env.PASS,
+            };
+
+            wifi_manager.enable_wifi_mode(conn_info, function(error) {
+                if (error) {
+                    console.log("Enable Wifi ERROR: " + error);
+                    console.log("Attempt to re-enable AP mode");
+                    wifi_manager.enable_ap_mode(config.access_point.ssid, function(error) {
+                        console.log("... AP mode reset");
+                    });
+                    response.redirect("/");
+                }
+                // Success! - exit
+                consolg.log("Wifi Enabled! - Exiting");
+                process.exit(0);
+            });
+        });
+
         app.listen(config.server.port);
         next_step();
     },
-
-    // 4+ - Config steps will be done as a result of REST calls made later
 
 ], function(error) {
     console.log("Done!!");

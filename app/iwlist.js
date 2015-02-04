@@ -15,6 +15,8 @@ module.exports = function(cmd_options, callback) {
         "ssid":            /ESSID:\"(.*)\"/,
         "quality":         /Quality=(\d+)\/100/,
         "signal_strength": /.*Signal level=(\d+)\/100/,
+        "encrypted":       /Encryption key:(on)/,
+        "open":            /Encryption key:(off)/,
     };
 
     exec("iwlist scan", function(error, stdout, stderr) {

@@ -17,8 +17,9 @@
 
     <div class = "page-header">
         <i class = "fa fa-rocket"></i> Rπ Wifi Config
-        <a href = "#" ng-click = "rescan()">
-            <i class = "fa fa-refresh"></i>
+        <a href = "#" ng-click = "rescan()" ng-class = "{ 'active': scan_running }">
+            <i class = "fa fa-refresh"
+               ng-class = "{ 'fa-spin': scan_running }"></i>
         </a>
     </div>
 
@@ -27,12 +28,23 @@
             <div class = "header">Choose a Wifi Ap:</div>
 
             <div class = "scan-result"
-                 ng-repeat = "cell in scan_results | orderBy:'-signal_strength'"
+                 ng-repeat = "cell in scan_results | orderBy:orderScanResults:true"
                  ng-class = "{ selected: ($index == selected_index) }"
                  ng-click = "change_selection($index)">
+                <div class = "secure" ng-if = "cell.encrypted"><i class = "fa fa-key"></i></div>
                 <div class = "ssid">{{ cell.ssid }}</div>
                 <div class = "signal_stength">{{ cell.signal_strength }}</div>
             </div>
+
+        </div>
+
+        <div class = "password_input"
+             ng-class = "{ hidden: (selected_index == null) }" >
+            <input type        = "password"
+                   placeholder = "Enter Network Passcode"
+                   name        = "network_passcode"
+                   ng-disabled = "selected_index == null"
+                   ng-model    = "network_passcode" required />
         </div>
     </div>
 

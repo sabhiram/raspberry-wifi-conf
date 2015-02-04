@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="RpiWifiConfig">
+
+
+<head>
+    <title>Rpi Wifi Config</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=1">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" >
+    <link rel="stylesheet" href="/app.css">
+</head>
+
+
+<body ng-controller="AppController">
+
+
+    <div class = "page-header">
+        <i class = "fa fa-rocket"></i> Rπ Wifi Config
+        <a href = "#" ng-click = "rescanWifi()">
+            <i class = "fa fa-refresh"></i>
+        </a>
+    </div>
+
+    <div class = "page-content">
+        <div class = "scan-results-container">
+        </div>
+    </div>
+
+
+    <!--
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.11/angular.js"></script>
+    <script src="/app.js"></script>
+</body>
+</html>
+
+

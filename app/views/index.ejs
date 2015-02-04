@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="RpiWifiConfig">
 
-
 <head>
     <title>Rpi Wifi Config</title>
     <meta charset="utf-8">
@@ -26,7 +25,11 @@
     <div class = "page-content">
         <div class = "scan-results-container">
             <div class = "header">Choose a Wifi Ap:</div>
-            <div class = "scan-result" ng-repeat = "cell in scan_results | orderBy:'signal_strength':true">
+
+            <div class = "scan-result"
+                 ng-repeat = "cell in scan_results | orderBy:'-signal_strength'"
+                 ng-class = "{ selected: ($index == selected_index) }"
+                 ng-click = "change_selection($index)">
                 <div class = "ssid">{{ cell.ssid }}</div>
                 <div class = "signal_stength">{{ cell.signal_strength }}</div>
             </div>
@@ -36,7 +39,9 @@
     <!-- Scripts load last -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.11/angular.js"></script>
     <script src="/app.js"></script>
+
 </body>
+
 </html>
 
 

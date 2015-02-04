@@ -82,6 +82,22 @@ html, body {
     position: relative;
     height: 30px; line-height: 30px;
     border-bottom: 1px dashed #039be5;
+
+    -webkit-transition: all 0.3s ease;
+    -moz-transition:    all 0.3s ease;
+    -ms-transition:     all 0.3s ease;
+    -o-transition:      all 0.3s ease;
+    transition:         all 0.3s ease;
+    cursor: pointer;
+}
+.scan-result:hover {
+    color: white;
+    background: #36ceff;
+}
+.scan-result.selected {
+    color: black;
+    background: #28e602;
+    /*background: #f9fb7f;*/
 }
 .scan-result .ssid {
     position: absolute;

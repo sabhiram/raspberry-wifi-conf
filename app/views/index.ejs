@@ -29,8 +29,8 @@
 
             <div class = "scan-result"
                  ng-repeat = "cell in scan_results | orderBy:orderScanResults:true"
-                 ng-class = "{ selected: ($index == selected_index) }"
-                 ng-click = "change_selection($index)">
+                 ng-class = "{ selected: (cell.address == selected_cell.address) }"
+                 ng-click = "change_selection(cell)">
                 <div class = "secure" ng-if = "cell.encrypted"><i class = "fa fa-key"></i></div>
                 <div class = "ssid">{{ cell.ssid }}</div>
                 <div class = "signal_stength">{{ cell.signal_strength }}</div>
@@ -39,12 +39,17 @@
         </div>
 
         <div class = "password_input"
-             ng-class = "{ hidden: (selected_index == null) }" >
+             ng-class = "{ hidden: (selected_cell == null) }" >
             <input type        = "password"
                    placeholder = "Enter Network Passcode"
                    name        = "network_passcode"
-                   ng-disabled = "selected_index == null"
+                   ng-disabled = "selected_cell == null"
                    ng-model    = "network_passcode" required />
+        </div>
+
+        <div class    = "submit_btn"
+             ng-click = "submit_selection()">
+            <i class = "fa fa-gavel"></i> Submit!
         </div>
     </div>
 

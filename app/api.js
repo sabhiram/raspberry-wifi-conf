@@ -1,7 +1,8 @@
-var path    = require("path"),
-    iwlist  = require("./iwlist"),
-    express = require("express"),
-    config  = require("../config.json");
+var path       = require("path"),
+    iwlist     = require("./iwlist"),
+    express    = require("express"),
+    bodyParser = require('body-parser'),
+    config     = require("../config.json");
 
 // Helper function to log errors and send a generic status "SUCCESS"
 // message to the caller
@@ -30,6 +31,7 @@ module.exports = function(wifi_manager, callback) {
 
     // Setup static routes to public assets
     app.use(express.static(path.join(__dirname, "public")));
+    app.use(bodyParser.json());
 
     // Setup HTTP routes for rendering views
     app.get("/", function(request, response) {
@@ -45,12 +47,14 @@ module.exports = function(wifi_manager, callback) {
         });
     });
 
-    app.get("/enable_wifi", function(request, response) {
+    app.post("/api/enable_wifi", function(request, response) {
         var conn_info = {
-            wifi_ssid:      process.env.SSID,
-            wifi_passcode:  process.env.PASS,
+            wifi_ssid:      request.body.wifi_ssid,
+            wifi_passcode:  request.body.wifi_passcode,
         };
 
+        // TODO: If wifi did not come up correctly, it should fail
+        // currently we ignore ifup failures.
         wifi_manager.enable_wifi_mode(conn_info, function(error) {
             if (error) {
                 console.log("Enable Wifi ERROR: " + error);

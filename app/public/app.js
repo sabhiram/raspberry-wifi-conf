@@ -21,14 +21,14 @@ app.controller("AppController", ["PiManager", "$scope", "$location", "$timeout",
     function(PiManager, $scope, $location, $timeout) {
         // Scope variable declaration
         $scope.scan_results = [];
-        $scope.selected_index = null;
+        $scope.selected_cell = null;
         $scope.scan_running = false;
         $scope.network_passcode = "";
 
         // Scope function definitions
         $scope.rescan = function() {
             $scope.scan_results = [];
-            $scope.selected_index = null;
+            $scope.selected_cell = null;
             $scope.scan_running = true;
             PiManager.rescan_wifi().then(function(response) {
                 console.log(response.data);
@@ -39,16 +39,30 @@ app.controller("AppController", ["PiManager", "$scope", "$location", "$timeout",
             });
         }
 
-        $scope.change_selection = function(index) {
+        $scope.change_selection = function(cell) {
+            console.log("Change selection to: " + cell.ssid);
             $scope.network_passcode = "";
-            console.log("Change selection to: " + index);
-            if (index >= 0 && index < $scope.scan_results.length) {
-                $scope.selected_index = index;
-            }
+            $scope.selected_cell = cell;
         }
 
         $scope.orderScanResults = function(cell) {
             return parseInt(cell.signal_strength);
+        }
+
+        $scope.submit_selection = function() {
+            if (!$scope.selected_cell) return;
+
+            var wifi_info = {
+                wifi_ssid:      $scope.selected_cell["ssid"],
+                wifi_passcode:  $scope.network_passcode,
+            };
+
+            PiManager.enable_wifi(wifi_info).then(function(response) {
+                console.log(response.data);
+                if (response.data.status == "SUCCESS") {
+                    console.log("AP Enabled - nothing left to do...");
+                }
+            });
         }
 
         // Defer load the scanned results from the rpi
@@ -67,6 +81,9 @@ app.service("PiManager", ["$http",
             rescan_wifi: function() {
                 return $http.get("/api/rescan_wifi");
             },
+            enable_wifi: function(wifi_info) {
+                return $http.post("/api/enable_wifi", wifi_info);
+            }
         };
     }]
 

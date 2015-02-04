@@ -200,8 +200,8 @@ module.exports = function() {
 
                 function update_hostapd_default(next_step) {
                     write_template_to_file(
-                        "./assets/etc/hostapd/hostapd.template",
-                        "/etc/hostapd/hostapd",
+                        "./assets/etc/default/hostapd.template",
+                        "/etc/default/hostapd",
                         context, next_step);
                 },
 

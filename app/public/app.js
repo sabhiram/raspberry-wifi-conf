@@ -23,7 +23,7 @@ app.controller("AppController", ["PiManager", "$scope", "$location", "$timeout",
         $scope.scan_results = [];
         $scope.selected_index = null;
         $scope.scan_running = false;
-        $scope.network_passcode = null;
+        $scope.network_passcode = "";
 
         // Scope function definitions
         $scope.rescan = function() {
@@ -40,6 +40,7 @@ app.controller("AppController", ["PiManager", "$scope", "$location", "$timeout",
         }
 
         $scope.change_selection = function(index) {
+            $scope.network_passcode = "";
             console.log("Change selection to: " + index);
             if (index >= 0 && index < $scope.scan_results.length) {
                 $scope.selected_index = index;

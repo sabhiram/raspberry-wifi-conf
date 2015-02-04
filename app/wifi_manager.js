@@ -2,8 +2,7 @@ var _       = require("underscore")._,
     async   = require("async"),
     fs      = require("fs"),
     exec    = require("child_process").exec,
-    util    = require("util"),
-    config  = require("./config.json");
+    config  = require("../config.json");
 
 // Better template format
 _.templateSettings = {

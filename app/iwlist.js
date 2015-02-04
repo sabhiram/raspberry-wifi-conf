@@ -1,6 +1,4 @@
-var _       = require("underscore")._,
-    exec    = require("child_process").exec,
-    util    = require("util");
+var exec    = require("child_process").exec;
 
 /*****************************************************************************\
     Return a function which is responsible for using "iwlist scan" to figure
@@ -42,7 +40,10 @@ module.exports = function(cmd_options, callback) {
 
         function append_previous_cell() {
             if (current_cell != null && interface_entry != null) {
-                interface_entry["scan_results"].push(current_cell);
+                if (typeof(current_cell["ssid"]) != "undefined" &&
+                    current_cell["ssid"] != "" ) {
+                    interface_entry["scan_results"].push(current_cell);
+                }
                 current_cell = null;
             }
         }

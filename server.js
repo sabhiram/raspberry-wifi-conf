@@ -1,13 +1,5 @@
-var _                   = require("underscore")._,
-    async               = require("async"),
-
-    util                = require("util"),
-    fs                  = require("fs"),
-    path                = require("path"),
-    express             = require("express"),
-
-    iwlist              = require("./iwlist"),
-    wifi_manager        = require("./wifi_manager")(),
+var async               = require("async"),
+    wifi_manager        = require("./app/wifi_manager")(),
     config              = require("./config.json");
 
 /*****************************************************************************\
@@ -25,6 +17,7 @@ var _                   = require("underscore")._,
        its bound to, reboot the pi and re-run this script on startup.
 \*****************************************************************************/
 async.series([
+
     // 1. Check if wifi is enabled / connected
     function test_is_wifi_enabled(next_step) {
         wifi_manager.is_wifi_enabled(function(error, result_ip) {
@@ -50,42 +43,16 @@ async.series([
         });
     },
 
-    // 3. Host HTTP server while functioning as AP
+    // 3. Host HTTP server while functioning as AP, the "api.js"
+    //    file contains all the needed logic to get a basic express
+    //    server up. It uses a small angular application which allows
+    //    us to choose the wifi of our choosing.
     function enable_express_server(next_step) {
-        var app = express();
-        app.set("view engine", "ejs");
-        app.set("views", path.join(__dirname, "templates"));
-        app.set("trust proxy", true);
-
-        app.get("/", function(request, response) {
-            response.send("<br><br><h1><a href='/enable_wifi'>ENABLE WIFI</a></h1>");
-        });
-
-        app.get("/enable_wifi", function(request, response) {
-            var conn_info = {
-                wifi_ssid:      process.env.SSID,
-                wifi_passcode:  process.env.PASS,
-            };
-
-            wifi_manager.enable_wifi_mode(conn_info, function(error) {
-                if (error) {
-                    console.log("Enable Wifi ERROR: " + error);
-                    console.log("Attempt to re-enable AP mode");
-                    wifi_manager.enable_ap_mode(config.access_point.ssid, function(error) {
-                        console.log("... AP mode reset");
-                    });
-                    response.redirect("/");
-                }
-                // Success! - exit
-                console.log("Wifi Enabled! - Exiting");
-                process.exit(0);
-            });
-        });
-
-        app.listen(config.server.port);
-        next_step();
+        require("./app/api.js")(wifi_manager, next_step);
     },
 
 ], function(error) {
-    console.log("Done!!");
+    if (error) {
+        console.log("ERROR: " + error);
+    }
 });

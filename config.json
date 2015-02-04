@@ -2,7 +2,7 @@
     "wifi_interface": "wlan0",
 
     "access_point": {
-        "force_reconfigure": true,
+        "force_reconfigure": false,
         "wifi_interface":    "wlan0",
         "ssid":              "rpi-config-ap",
         "passphrase":        "zzzzzzzz",
@@ -18,6 +18,6 @@
     },
 
     "server": {
-        "port": 88
+        "port": 1288
     }
 }

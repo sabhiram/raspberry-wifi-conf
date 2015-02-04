@@ -9,7 +9,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-    <!-- <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"> -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" >
     <link rel="stylesheet" href="/app.css">
 </head>
@@ -17,24 +16,24 @@
 
 <body ng-controller="AppController">
 
-
     <div class = "page-header">
         <i class = "fa fa-rocket"></i> Rπ Wifi Config
-        <a href = "#" ng-click = "rescanWifi()">
+        <a href = "#" ng-click = "rescan()">
             <i class = "fa fa-refresh"></i>
         </a>
     </div>
 
     <div class = "page-content">
         <div class = "scan-results-container">
+            <div class = "header">Choose a Wifi Ap:</div>
+            <div class = "scan-result" ng-repeat = "cell in scan_results | orderBy:'signal_strength':true">
+                <div class = "ssid">{{ cell.ssid }}</div>
+                <div class = "signal_stength">{{ cell.signal_strength }}</div>
+            </div>
         </div>
     </div>
 
-
-    <!--
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-    -->
+    <!-- Scripts load last -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.11/angular.js"></script>
     <script src="/app.js"></script>
 </body>

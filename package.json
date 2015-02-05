@@ -1,5 +1,5 @@
 {
-  "name": "rpi-connect-to-wifi",
+  "name": "raspberry-wifi-conf",
   "version": "0.0.1",
   "description": "Node RPI Wifi Configuration Application",
   "main": "server.js",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/sabhiram/rpi-connect-to-wifi.git"
+    "url": "git://github.com/sabhiram/raspberry-wifi-conf.git"
   },
   "keywords": [
     "RaspberryPi",
@@ -20,9 +20,9 @@
   "author": "Shaba Abhiram",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/sabhiram/rpi-connect-to-wifi/issues"
+    "url": "https://github.com/sabhiram/raspberry-wifi-conf/issues"
   },
-  "homepage": "https://github.com/sabhiram/rpi-connect-to-wifi",
+  "homepage": "https://github.com/sabhiram/raspberry-wifi-conf",
   "dependencies": {
     "body-parser": "^1.11.0",
     "underscore": "~1.7.0",

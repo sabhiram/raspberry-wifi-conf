@@ -79,11 +79,11 @@ In my config file, I have set up the static ip for my PI when in AP mode to `192
 
 Step 1: Power on Pi which runs this app on startup (assume it is not configured for a wifi connection). Once it boots up, you will see `rpi-config-ap` among the wifi connections.
 
-![Wireless AP Broadcast](https://raw.githubusercontent.com/sabhiram/public-images/master/raspberry-wifi-conf/wifi_options.png)
+<img src="https://raw.githubusercontent.com/sabhiram/public-images/master/raspberry-wifi-conf/wifi_options.png" width="200px" height="160px" />
 
 Step 2: Join the above network, and navigate to the static IP we set in our config file (`192.168.44.1`), you will see:
 
-![The HTTP Interface](https://raw.githubusercontent.com/sabhiram/public-images/master/raspberry-wifi-conf/ui.png)
+<img src="https://raw.githubusercontent.com/sabhiram/public-images/master/raspberry-wifi-conf/ui.png" width="320px" height="500px" />
 
 Step 3: Select your home (or whatever) network, punch in the wifi passcode if any, and click `Submit`. You are done! Your Pi is now on your home wifi!!
 

@@ -13,8 +13,8 @@ This project broadly follows these [instructions](http://www.maketecheasier.com/
 ## Install
 
 ```sh
-$git clone git@github.com:sabhiram/rpi-connect-to-wifi.git
-$cd rpi-connect-to-wifi
+$git clone git@github.com:sabhiram/raspberry-wifi-conf.git
+$cd raspberry-wifi-conf
 $npm update
 $sudo npm run-script provision
 $sudo npm start

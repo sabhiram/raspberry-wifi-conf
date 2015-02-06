@@ -89,8 +89,7 @@ Step 3: Select your home (or whatever) network, punch in the wifi passcode if an
 
 ## Testing
 
-TODO: Write simple tests for external libs
-TODO: Enable TravisCI, Coveralls
+TODO
 
 ## TODO
 
@@ -98,3 +97,5 @@ TODO: Enable TravisCI, Coveralls
 2. Automate provisioning of the application dependencies
 3. Make the running of scripts cleaner and more easy to read
 4. ifup should never be allowed to fail... same w/ the "start" pieces of various services. Perhaps we need to tease the restart into stop and start and allow the stop to fail.
+5. Add tests
+6. Add travis ci / coveralls hook(s)

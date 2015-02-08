@@ -233,7 +233,6 @@ module.exports = function() {
 
     // Disables AP mode and reverts to wifi connection
     _enable_wifi_mode = function(connection_info, callback) {
-        console.log("Entered: _enable_wifi_mode");
 
         _is_wifi_enabled(function(error, result_ip) {
             if (error) return callback(error);

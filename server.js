@@ -25,7 +25,10 @@ async.series([
         dependency_manager.check_deps({
             "binaries": ["dhcpd", "hostapd", "iw"],
             "files":    ["/etc/init.d/isc-dhcp-server"]
-        }, next_step);
+        }, function(error) {
+            if (error) console.log(" * Dependency error, did you run `sudo npm run-script provision`?");
+            next_step(error);
+        });
     },
 
     // 2. Check if wifi is enabled / connected
@@ -35,7 +38,7 @@ async.series([
                 console.log("\nWifi is enabled, and IP " + result_ip + " assigned");
                 process.exit(0);
             } else {
-                console.log("\nWifi is not enabled, Enable AP for self-configure");
+                console.log("\nWifi is not enabled, Enabling AP for self-configure");
             }
             next_step(error);
         });
@@ -57,7 +60,7 @@ async.series([
     //    file contains all the needed logic to get a basic express
     //    server up. It uses a small angular application which allows
     //    us to choose the wifi of our choosing.
-    function enable_express_server(next_step) {
+    function start_http_server(next_step) {
         require("./app/api.js")(wifi_manager, next_step);
     },
 

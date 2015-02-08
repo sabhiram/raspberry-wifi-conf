@@ -20,6 +20,16 @@ $sudo npm run-script provision
 $sudo npm start
 ```
 
+## Setup the app as a service
+
+There is a startup script included to make the server starting and stopping easier. Do remember that the application is assumed to be installed under `/home/pi/raspberry-wifi-conf`. Feel free to change this in the `assets/init.d/raspberry-wifi-conf` file.
+
+```sh
+$sudo cp assets/init.d/raspberry-wifi-conf /etc/init.d/raspberry-wifi-conf 
+$sudo chmod +x /etc/init.d/raspberry-wifi-conf  
+$sudo update-rc.d raspberry-wifi-conf defaults
+```
+
 #### Gotchas
 
 The `hostapd` application does not like to behave itself on some wifi adapters (RTL8192CU et al). This link does a good job explaining the issue and the remedy: [Edimax Wifi Issues](http://willhaley.com/blog/raspberry-pi-hotspot-ew7811un-rtl8188cus/). The gist of what you need to do is as follows:

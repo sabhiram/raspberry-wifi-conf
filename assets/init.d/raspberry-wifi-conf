@@ -1,0 +1,30 @@
+#! /bin/sh
+# /etc/init.d/raspberry-wifi-conf
+
+### BEGIN INIT INFO
+# Provides:          raspberry-wifi-conf
+# Required-Start:    $local_fs $syslog $network
+# Required-Stop:     $local_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Script to ensure wifi connectivity
+# Description:       A NodeJS application to ensure Wifi connectivity by setting the RPI as an AP if needed
+### END INIT INFO
+
+# Carry out specific functions when asked to by the system
+case "$1" in
+  start)
+    echo "Starting raspberry-wifi-conf service"
+    cd /home/pi/raspberry-wifi-conf
+    sudo /usr/bin/node server.js > service.log
+    ;;
+  stop)
+    echo "Stopping raspberry-wifi-conf service"
+    ;;
+  *)
+    echo "Usage: /etc/init.d/raspberry-wifi-conf {start|stop}"
+    exit 1
+    ;;
+esac
+
+exit 0

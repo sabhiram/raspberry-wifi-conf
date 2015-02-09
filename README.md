@@ -47,16 +47,9 @@ $sudo mv assets/bin/hostapd.rtl871xdrv /usr/sbin/hostapd
 $sudo chmod 755 /usr/sbin/hostapd
 ```
 
-Also note that since I run the `rtl871xdrv`, I have this value hard-coded into the `/assets/etc/hostapd/hostapd.conf.template`. For the `nl80211` devices, change the conf template as so (this will eventually be automatic as the application boots up):
+Note that the `wifi_driver_type` config variable is defaulted to the `nl80211` driver. However, if `iw list` fails on the app startup, it will automatically set the driver type of `rtl871xdrv`. Remember that even though you do not need to update the config / default value - you will need to use the updated `hostapd` binary bundled with this app.
 
-```
-interface={{ wifi_interface }}
-
-driver=nl80211
-#driver=rtl871xdrv
-```
-
-TODO: Make the server smarter: once dependency checks and provisioning is built into the app, we can do the `iwlist` check and copy the appropriate version of `hostapd`.
+TODO: Automatically maintain the correct version of `hostapd` based on the `wifi_driver_type`.
 
 ## Usage
 

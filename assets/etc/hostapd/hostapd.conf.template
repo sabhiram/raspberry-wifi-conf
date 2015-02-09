@@ -1,7 +1,6 @@
 interface={{ wifi_interface }}
 
-#driver=nl80211
-driver=rtl871xdrv
+driver={{ wifi_driver_type }}
 
 ssid={{ ssid }}
 hw_mode=g

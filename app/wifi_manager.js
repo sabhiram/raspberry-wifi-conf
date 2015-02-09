@@ -32,6 +32,13 @@ function write_template_to_file(template_path, file_name, context, callback) {
     connection information
 \*****************************************************************************/
 module.exports = function() {
+    // Detect which wifi driver we should use, the rtl871xdrv or the nl80211
+    exec("iw list", function(error, stdout, stderr) {
+        if (stderr.match(/^nl80211 not found/)) {
+            config.wifi_driver_type = "rtl871xdrv";
+        }
+        // console.log("config.wifi_driver_type = " + config.wifi_driver_type);
+    });
 
     // Hack: this just assumes that the outbound interface will be "wlan0"
 
@@ -159,6 +166,7 @@ module.exports = function() {
 
             var context = config.access_point;
             context["enable_ap"] = true;
+            context["wifi_driver_type"] = config.wifi_driver_type;
 
             // Here we need to actually follow the steps to enable the ap
             async.series([

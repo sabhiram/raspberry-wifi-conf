@@ -2,9 +2,6 @@
   "name": "raspberry-wifi-conf",
   "version": "0.0.0",
   "homepage": "https://github.com/stefangordon/raspberry-wifi-conf",
-  "authors": [
-    "Stefan Gordon <stefan@keirgordon.com>"
-  ],
   "license": "MIT",
   "private": true,
   "ignore": [
@@ -12,6 +9,11 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
-  ]
+    "tests",
+    "app/public/external"
+  ],
+  "dependencies": {
+    "angularjs": "~1.3.13",
+    "font-awesome": "~4.3.0"
+  }
 }

@@ -10,8 +10,16 @@ Once configured, it prompts the PI to reboot with the appropriate wifi credentia
 
 This project broadly follows these [instructions](http://www.maketecheasier.com/set-up-raspberry-pi-as-wireless-access-point/) in setting up a RaspberryPi as a wireless AP.
 
+## Requirements
+
+The NodeJS modules required are pretty much just `underscore`, `async`, and `express`. 
+
+The web application requires `angular` and `font-awesome` to render correctly. To make the deployment of this easy, one of the other requirements is `bower`.
+
+If you do not have `bower` installed already, you can install it globally by running: `sudo npm install bower -g`.
+
 ## Install
-Install assumes bower is present.  If not, `sudo npm install bower -g` first.
+
 ```sh
 $git clone git@github.com:sabhiram/raspberry-wifi-conf.git
 $cd raspberry-wifi-conf

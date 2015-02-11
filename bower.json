@@ -1,7 +1,6 @@
 {
   "name": "raspberry-wifi-conf",
   "version": "0.0.0",
-  "homepage": "https://github.com/stefangordon/raspberry-wifi-conf",
   "license": "MIT",
   "private": true,
   "ignore": [

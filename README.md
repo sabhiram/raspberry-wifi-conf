@@ -11,11 +11,12 @@ Once configured, it prompts the PI to reboot with the appropriate wifi credentia
 This project broadly follows these [instructions](http://www.maketecheasier.com/set-up-raspberry-pi-as-wireless-access-point/) in setting up a RaspberryPi as a wireless AP.
 
 ## Install
-
+Install assumes bower is present.  If not, `sudo npm install bower -g` first.
 ```sh
 $git clone git@github.com:sabhiram/raspberry-wifi-conf.git
 $cd raspberry-wifi-conf
 $npm update
+$bower install
 $sudo npm run-script provision
 $sudo npm start
 ```

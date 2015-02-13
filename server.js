@@ -3,6 +3,17 @@ var async               = require("async"),
     dependency_manager  = require("./app/dependency_manager")(),
     config              = require("./config.json");
 
+/* HTTP_SERVER_ONLY_FOR TESTING */
+// Override so I can mock the HTTP interface and play with the UI from my
+// dev box :)
+if (config.http_test_only) {
+    async = { series: function(list) { console.log("Doing nothin"); } };
+
+    // Kick off the server
+    require("./app/api.js")(wifi_manager);
+}
+/* HTTP_SERVER_ONLY_FOR TESTING */
+
 /*****************************************************************************\
     1. Check for dependencies
     2. Check to see if we are connected to a wifi AP

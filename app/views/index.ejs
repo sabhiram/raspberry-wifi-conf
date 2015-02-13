@@ -13,7 +13,8 @@
 </head>
 
 
-<body ng-controller="AppController">
+<body ng-controller = "AppController"
+      ng-keyup      = "$event.keyCode == 27 ? change_selection(null) : ''">
 
     <div class = "page-header">
         <i class = "fa fa-wifi"></i> Choose a Wifi Ap
@@ -36,21 +37,13 @@
             </div>
 
         </div>
-
-        <!--
-        <div class = "password_input"
-             ng-class = "{ hidden: (selected_cell == null) }" >
-            <input type        = "password"
-                   placeholder = "Enter Network Passcode"
-                   name        = "network_passcode"
-                   ng-disabled = "selected_cell == null"
-                   ng-model    = "network_passcode" required />
-        </div>
-        -->
     </div>
 
     <rwc-password-entry
-        visible = "show_passcode_entry_field" />
+        visible     = "show_passcode_entry_field"
+        passcode    = "network_passcode"
+        selection   = "selected_cell"
+        ng-keydown  = "{esc: 'close_password_entry()'}" />
 
     <!-- Scripts load last -->
     <script src="/external/angularjs/angular.min.js"></script>

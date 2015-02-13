@@ -63,26 +63,11 @@ html, body {
     height: calc(100% - 5px);
     border-bottom: 2px solid white;
 
-    background: #f0f9fe;
-    background: #222222;
-
-    /*-moz-box-shadow: 0px 0px 3px #111111;
-    -webkit-box-shadow: 0px 0px 3px #111111;
-    box-shadow: 0px 0px 3px #111111;*/
+    background: #ffffff;
 
     overflow-y: auto;
     overflow-x: hidden;
 }
-
-/*
-.scan-results-container .header {
-    height: 45px; line-height: 45px;
-    background: #222222; #039be5;
-    text-align: center;
-    font-size: 15pt; color: white;
-    border-bottom: 2px solid #111111;
-}
-*/
 
 .scan-result {
     color: white;
@@ -96,7 +81,8 @@ html, body {
     transition:         all 0.3s ease;
     cursor: pointer;
 
-    border-bottom: 2px solid #888888;
+    border-bottom: 2px solid #666666;
+    background: #222222;
 }
 .scan-result:hover {
     color: yellow;
@@ -112,7 +98,7 @@ html, body {
     width: 80%; height: 100%;
 }
 .scan-result .secure {
-    color: #888888;
+    color: white;
     padding-left: 3px;
 }
 .scan-result .signal_stength {
@@ -120,6 +106,8 @@ html, body {
     top: 0; left: 85%;
     width: 10%; height: 100%;
 }
+
+/*
 
 .password_input {
     margin: 0 auto;
@@ -156,7 +144,7 @@ html, body {
     width: 80%; max-width: 300px;
     height: 45px; line-height: 45px;
 
-    background: #222222; /*#039be5;*/
+    background: #222222;
     color: white;
     cursor: pointer;
 
@@ -177,7 +165,7 @@ html, body {
     background: #28e602;
     color: black;
 }
-
+*/
 
 
 .rwc-password-entry-container {

@@ -16,7 +16,7 @@
 <body ng-controller="AppController">
 
     <div class = "page-header">
-        <i class = "fa fa-rocket"></i> Rπ Wifi Config
+        <i class = "fa fa-wifi"></i> Choose a Wifi Ap
         <a href = "#" ng-click = "rescan()" ng-class = "{ 'active': scan_running }">
             <i class = "fa fa-refresh"
                ng-class = "{ 'fa-spin': scan_running }"></i>
@@ -25,7 +25,6 @@
 
     <div class = "page-content">
         <div class = "scan-results-container">
-            <div class = "header">Choose a Wifi Ap:</div>
 
             <div class = "scan-result"
                  ng-repeat = "cell in scan_results | orderBy:orderScanResults:true"
@@ -37,7 +36,7 @@
             </div>
 
         </div>
-
+<!--
         <div class = "password_input"
              ng-class = "{ hidden: (selected_cell == null) }" >
             <input type        = "password"
@@ -45,12 +44,7 @@
                    name        = "network_passcode"
                    ng-disabled = "selected_cell == null"
                    ng-model    = "network_passcode" required />
-        </div>
-
-        <div class    = "submit_btn"
-             ng-click = "submit_selection()">
-            <i class = "fa fa-gavel"></i> Submit!
-        </div>
+        </div> -->
     </div>
 
     <!-- Scripts load last -->

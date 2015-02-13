@@ -22,13 +22,13 @@
     "# lines tell chloe which files to prune.                          ",
     "# Check it out: https://github.com/sabhiram/go-chloe              ",
 
-    "external/**/*.md",
-    "external/**/*.json",
-    "external/**/*.gzip",
-    "external/**/.*ignore",
+    "**/external/**/*.md",
+    "**/external/**/*.json",
+    "**/external/**/*.gzip",
+    "**/external/**/.*ignore",
 
-    "external/angularjs/*.css",
-    "external/font-awesome/less",
-    "external/font-awesome/scss"
+    "**/external/angularjs/*.css",
+    "**/external/font-awesome/less",
+    "**/external/font-awesome/scss"
   ]
 }

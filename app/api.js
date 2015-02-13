@@ -44,21 +44,6 @@ module.exports = function(wifi_manager, callback) {
     // the responses to these are typically JSON
     app.get("/api/rescan_wifi", function(request, response) {
         console.log("Server got /rescan_wifi");
-
-        /* HTTP_SERVER_ONLY_FOR TESTING */
-        if (http_test) {
-            return log_error_send_success_with({
-                interface: "wlan0",
-                scan_results: [
-                    { ssid: "WifiA", address: "a1bc", "signal_strength": 57 },
-                    { ssid: "WifiB", address: "a2bc", "signal_strength": 35 },
-                    { ssid: "WifiC", address: "a3bc", "signal_strength": 65 },
-                    { ssid: "WifiD", address: "a4bc", "signal_strength": 95 },
-                ]
-            }, null, response);
-        }
-        /* HTTP_SERVER_ONLY_FOR TESTING */
-
         iwlist(function(error, result) {
             log_error_send_success_with(result[0], error, response);
         });
@@ -69,14 +54,6 @@ module.exports = function(wifi_manager, callback) {
             wifi_ssid:      request.body.wifi_ssid,
             wifi_passcode:  request.body.wifi_passcode,
         };
-
-        /* HTTP_SERVER_ONLY_FOR TESTING */
-        if (http_test) {
-            console.log("Early exit for mock /api/enable_wifi");
-            console.log(util.inspect(conn_info));
-            return response.redirect("/");
-        }
-        /* HTTP_SERVER_ONLY_FOR TESTING */
 
         // TODO: If wifi did not come up correctly, it should fail
         // currently we ignore ifup failures.

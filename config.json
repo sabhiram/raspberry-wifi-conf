@@ -1,7 +1,6 @@
 {
     "wifi_interface": "wlan0",
     "wifi_driver_type": "nl80211",
-    "http_test_only": true,
 
     "access_point": {
         "force_reconfigure": false,
@@ -20,6 +19,6 @@
     },
 
     "server": {
-        "port": 1288
+        "port": 88
     }
 }

@@ -93,7 +93,9 @@ app.service("PiManager", ["$http",
 
 );
 
-
+/*****************************************************************************\
+    Directive to show / hide / clear the password prompt
+\*****************************************************************************/
 app.directive("rwcPasswordEntry", function($timeout) {
     return {
         restrict: "E",

@@ -36,7 +36,8 @@
             </div>
 
         </div>
-<!--
+
+        <!--
         <div class = "password_input"
              ng-class = "{ hidden: (selected_cell == null) }" >
             <input type        = "password"
@@ -44,8 +45,12 @@
                    name        = "network_passcode"
                    ng-disabled = "selected_cell == null"
                    ng-model    = "network_passcode" required />
-        </div> -->
+        </div>
+        -->
     </div>
+
+    <rwc-password-entry
+        visible = "show_passcode_entry_field" />
 
     <!-- Scripts load last -->
     <script src="/external/angularjs/angular.min.js"></script>

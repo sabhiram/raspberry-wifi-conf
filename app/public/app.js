@@ -20,10 +20,11 @@ app.controller("AppController", ["PiManager", "$scope", "$location", "$timeout",
 
     function(PiManager, $scope, $location, $timeout) {
         // Scope variable declaration
-        $scope.scan_results = [];
-        $scope.selected_cell = null;
-        $scope.scan_running = false;
-        $scope.network_passcode = "";
+        $scope.scan_results              = [];
+        $scope.selected_cell             = null;
+        $scope.scan_running              = false;
+        $scope.network_passcode          = "";
+        $scope.show_passcode_entry_field = false;
 
         // Scope function definitions
         $scope.rescan = function() {
@@ -43,6 +44,7 @@ app.controller("AppController", ["PiManager", "$scope", "$location", "$timeout",
             console.log("Change selection to: " + cell.ssid);
             $scope.network_passcode = "";
             $scope.selected_cell = cell;
+            $scope.show_passcode_entry_field = true;
         }
 
         $scope.orderScanResults = function(cell) {
@@ -89,3 +91,30 @@ app.service("PiManager", ["$http",
 
 );
 
+
+app.directive("rwcPasswordEntry", function($timeout) {
+    return {
+        restrict: "E",
+
+        scope: {
+            visible:  "=",    // Text binding for album name
+        },
+
+        replace: true,          // Use provided template (as opposed to static
+                                // content that the modal scope might define in the
+                                // DOM)
+        template: [
+            "<div class='rwc-password-entry-container' ng-class='{\"hide-me\": !visible}'>",
+            "</div>"
+        ].join("\n"),
+
+        // Link function to bind modal to the app
+        link: function(scope, element, attributes) {
+            // Set the toolbox visiblity to false
+            $timeout(function() {
+                console.log("About to hide");
+                scope.visible = false;
+            }, 2000);
+        },
+    };
+});

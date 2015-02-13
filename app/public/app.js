@@ -99,8 +99,10 @@ app.directive("rwcPasswordEntry", function($timeout) {
         restrict: "E",
 
         scope: {
-            visible:   "=",    // Text binding for entry visibility
-            passcode:  "=",    // Text binding for passcode
+            visible:  "=",
+            passcode: "=",
+            reset:    "&",
+            submit:   "&",
         },
 
         replace: true,          // Use provided template (as opposed to static
@@ -108,12 +110,16 @@ app.directive("rwcPasswordEntry", function($timeout) {
                                 // DOM)
         template: [
             "<div class='rwc-password-entry-container' ng-class='{\"hide-me\": !visible}'>",
+            "    <div class='box'>",
+            "         <input type = 'password' placeholder = 'Passcode...' ng-model = 'passcode' />",
+            "         <div class = 'btn btn-cancel' ng-click = 'reset(null)'>Cancel</div>",
+            "         <div class = 'btn btn-ok' ng-click = 'submit()'>Submit</div>",
+            "    </div>",
             "</div>"
         ].join("\n"),
 
         // Link function to bind modal to the app
         link: function(scope, element, attributes) {
-
         },
     };
 });

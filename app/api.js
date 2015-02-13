@@ -1,4 +1,5 @@
 var path       = require("path"),
+    util       = require("util"),
     iwlist     = require("./iwlist"),
     express    = require("express"),
     bodyParser = require('body-parser'),
@@ -72,6 +73,7 @@ module.exports = function(wifi_manager, callback) {
         /* HTTP_SERVER_ONLY_FOR TESTING */
         if (http_test) {
             console.log("Early exit for mock /api/enable_wifi");
+            console.log(util.inspect(conn_info));
             return response.redirect("/");
         }
         /* HTTP_SERVER_ONLY_FOR TESTING */

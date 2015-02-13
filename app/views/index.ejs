@@ -42,7 +42,8 @@
     <rwc-password-entry
         visible     = "show_passcode_entry_field"
         passcode    = "network_passcode"
-        selection   = "selected_cell"
+        reset       = "change_selection()"
+        submit      = "submit_selection()"
         ng-keydown  = "{esc: 'close_password_entry()'}" />
 
     <!-- Scripts load last -->

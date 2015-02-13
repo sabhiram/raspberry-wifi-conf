@@ -26,6 +26,14 @@ app.controller("AppController", ["PiManager", "$scope", "$location", "$timeout",
         $scope.network_passcode          = "";
         $scope.show_passcode_entry_field = false;
 
+        // Scope filter definitions
+        $scope.orderScanResults = function(cell) {
+            return parseInt(cell.signal_strength);
+        }
+
+        $scope.foo = function() { console.log("foo"); }
+        $scope.bar = function() { console.log("bar"); }
+
         // Scope function definitions
         $scope.rescan = function() {
             $scope.scan_results = [];
@@ -41,14 +49,9 @@ app.controller("AppController", ["PiManager", "$scope", "$location", "$timeout",
         }
 
         $scope.change_selection = function(cell) {
-            console.log("Change selection to: " + cell.ssid);
             $scope.network_passcode = "";
             $scope.selected_cell = cell;
-            $scope.show_passcode_entry_field = true;
-        }
-
-        $scope.orderScanResults = function(cell) {
-            return parseInt(cell.signal_strength);
+            $scope.show_passcode_entry_field = (cell != null) ? true : false;
         }
 
         $scope.submit_selection = function() {
@@ -70,7 +73,6 @@ app.controller("AppController", ["PiManager", "$scope", "$location", "$timeout",
         // Defer load the scanned results from the rpi
         $scope.rescan();
     }]
-
 );
 
 /*****************************************************************************\
@@ -91,13 +93,18 @@ app.service("PiManager", ["$http",
 
 );
 
-
+/*****************************************************************************\
+    Directive to show / hide / clear the password prompt
+\*****************************************************************************/
 app.directive("rwcPasswordEntry", function($timeout) {
     return {
         restrict: "E",
 
         scope: {
-            visible:  "=",    // Text binding for album name
+            visible:  "=",
+            passcode: "=",
+            reset:    "&",
+            submit:   "&",
         },
 
         replace: true,          // Use provided template (as opposed to static
@@ -105,16 +112,16 @@ app.directive("rwcPasswordEntry", function($timeout) {
                                 // DOM)
         template: [
             "<div class='rwc-password-entry-container' ng-class='{\"hide-me\": !visible}'>",
+            "    <div class='box'>",
+            "         <input type = 'password' placeholder = 'Passcode...' ng-model = 'passcode' />",
+            "         <div class = 'btn btn-cancel' ng-click = 'reset(null)'>Cancel</div>",
+            "         <div class = 'btn btn-ok' ng-click = 'submit()'>Submit</div>",
+            "    </div>",
             "</div>"
         ].join("\n"),
 
         // Link function to bind modal to the app
         link: function(scope, element, attributes) {
-            // Set the toolbox visiblity to false
-            $timeout(function() {
-                console.log("About to hide");
-                scope.visible = false;
-            }, 2000);
         },
     };
 });

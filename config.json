@@ -3,7 +3,7 @@
     "wifi_driver_type": "nl80211",
 
     "access_point": {
-        "force_reconfigure": false,
+        "force_reconfigure": true,
         "wifi_interface":    "wlan0",
         "ssid":              "rpi-config-ap",
         "passphrase":        "zzzzzzzz",

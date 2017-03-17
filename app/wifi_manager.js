@@ -59,6 +59,8 @@ module.exports = function() {
         var output = {
             hw_addr:      "<unknown>",
             inet_addr:    "<unknown>",
+            ap_addr:      "<unknown_ap>",
+            ap_ssid:      "<unknown_ssid>",
             unassociated: "<unknown>",
         };
 

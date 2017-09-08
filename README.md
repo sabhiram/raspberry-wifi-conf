@@ -29,6 +29,21 @@ $sudo npm run-script provision
 $sudo npm start
 ```
 
+Now lets check to see if you have `dhcpcd` installed on your os, if you do - we have one more small step.
+
+Run `which dhcpcd` on your pi, if this returns any string (like `/sbin/dhcpcd`) then we need to add one line to the `dhcpcd.conf` file asking it to ignore the wireless interface that we are using for the AP.
+
+Add this to the very begenning of `/etc/dhcpcd.conf` (substitute your wifi interface for wlan0):
+```
+denyinterfaces wlan0
+```
+
+If you are into quick one-liners you can do this to prepend the line to the file.
+
+```
+echo "denyinterfaces wlan0" | cat - /etc/dhcpcd.conf > /tmp/out && sudo mv /tmp/out /etc/dhcpcd.conf
+```
+
 ## Setup the app as a service
 
 There is a startup script included to make the server starting and stopping easier. Do remember that the application is assumed to be installed under `/home/pi/raspberry-wifi-conf`. Feel free to change this in the `assets/init.d/raspberry-wifi-conf` file.
@@ -39,7 +54,9 @@ $sudo chmod +x /etc/init.d/raspberry-wifi-conf
 $sudo update-rc.d raspberry-wifi-conf defaults
 ```
 
-#### Gotchas
+### Gotchas
+
+#### `hostapd`
 
 The `hostapd` application does not like to behave itself on some wifi adapters (RTL8192CU et al). This link does a good job explaining the issue and the remedy: [Edimax Wifi Issues](http://willhaley.com/blog/raspberry-pi-hotspot-ew7811un-rtl8188cus/). The gist of what you need to do is as follows:
 
@@ -58,7 +75,11 @@ $sudo chmod 755 /usr/sbin/hostapd
 
 Note that the `wifi_driver_type` config variable is defaulted to the `nl80211` driver. However, if `iw list` fails on the app startup, it will automatically set the driver type of `rtl871xdrv`. Remember that even though you do not need to update the config / default value - you will need to use the updated `hostapd` binary bundled with this app.
 
-TODO: Automatically maintain the correct version of `hostapd` based on the `wifi_driver_type`.
+#### `dhcpcd` 
+
+Latest versions of raspbian use dhcpcd to manage network interfaces, since we are running our own dhcp server, if you have dhcpcd installed - make sure you deny the wifi interface as described in the installation section. 
+
+TODO: Handle this automatically.
 
 ## Usage
 

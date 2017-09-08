@@ -36,7 +36,12 @@ async.series([
         wifi_manager.is_wifi_enabled(function(error, result_ip) {
             if (result_ip) {
                 console.log("\nWifi is enabled, and IP " + result_ip + " assigned");
-                process.exit(0);
+                var reconfigure = config.access_point.force_reconfigure || false;
+                if (reconfigure) {
+                    console.log("\nForce reconfigure enabled - try to enable access point");
+                } else {
+                    process.exit(0);
+                }
             } else {
                 console.log("\nWifi is not enabled, Enabling AP for self-configure");
             }
@@ -61,6 +66,7 @@ async.series([
     //    server up. It uses a small angular application which allows
     //    us to choose the wifi of our choosing.
     function start_http_server(next_step) {
+        console.log("\nHTTP server running...");
         require("./app/api.js")(wifi_manager, next_step);
     },
 

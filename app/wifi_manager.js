@@ -37,7 +37,6 @@ module.exports = function() {
         if (stderr.match(/^nl80211 not found/)) {
             config.wifi_driver_type = "rtl871xdrv";
         }
-        // console.log("config.wifi_driver_type = " + config.wifi_driver_type);
     });
 
     // Hack: this just assumes that the outbound interface will be "wlan0"
@@ -131,13 +130,20 @@ module.exports = function() {
 
     // Access Point related functions
     _is_ap_enabled_sync = function(info) {
-        // If the hw_addr matches the ap_addr
-        // and the ap_ssid matches "rpi-config-ap"
-        // then we are in AP mode
-        var is_ap  =
-            info["hw_addr"].toLowerCase() == info["ap_addr"].toLowerCase() &&
-            info["ap_ssid"] == config.access_point.ssid;
-        return (is_ap) ? info["hw_addr"].toLowerCase() : null;
+        // If the current IP assigned to the chosen wireless interface is
+        // the one specified for the access point in the config, we are in
+        // access-point mode. 
+        // var is_ap  =
+        //     info["inet_addr"].toLowerCase() == info["ap_addr"].toLowerCase() &&
+        //     info["ap_ssid"] == config.access_point.ssid;
+        // NOTE: I used to detect this using the "ESSID" and "Access Point"
+        //       members from if/iwconfig.  These have been removed when the
+        //       interface is running as an access-point itself.  To cope with
+        //       this we are taking the simple way out, but at the cost that
+        //       if you join a wifi network with the same subnet, you could
+        //       collide and have the pi think that it is still in AP mode.
+        var is_ap = info["inet_addr"] == config.access_point.ip_addr;
+        return (is_ap) ? info["inet_addr"].toLowerCase() : null;
     },
 
     _is_ap_enabled = function(callback) {
@@ -184,7 +190,6 @@ module.exports = function() {
 
                 // Enable DHCP conf, set authoritative mode and subnet
                 function update_dhcpd(next_step) {
-                    var context = config.access_point;
                     // We must enable this to turn on the access point
                     write_template_to_file(
                         "./assets/etc/dhcp/dhcpd.conf.template",
@@ -234,8 +239,11 @@ module.exports = function() {
                         next_step();
                     });
                 },
-
-                // TODO: Do we need to issue a reboot here?
+                
+                // Might be redundant.
+                function reboot_network_interfaces(next_step) {
+                    _reboot_wireless_network(config.wifi_interface, next_step);
+                },
 
             ], callback);
         });

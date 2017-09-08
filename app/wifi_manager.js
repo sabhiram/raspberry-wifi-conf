@@ -220,16 +220,16 @@ module.exports = function() {
                         context, next_step);
                 },
 
-                function reboot_network_interfaces(next_step) {
-                    _reboot_wireless_network(context.wifi_interface, next_step);
-                },
-
                 function restart_dhcp_service(next_step) {
                     exec("service isc-dhcp-server restart", function(error, stdout, stderr) {
-                        //console.log(stdout);
                         if (!error) console.log("... dhcp server restarted!");
+                        else console.log("... dhcp server failed! - " + stdout);
                         next_step();
                     });
+                },
+
+                function reboot_network_interfaces(next_step) {
+                    _reboot_wireless_network(config.wifi_interface, next_step);
                 },
 
                 function restart_hostapd_service(next_step) {
@@ -240,10 +240,6 @@ module.exports = function() {
                     });
                 },
                 
-                // Might be redundant.
-                function reboot_network_interfaces(next_step) {
-                    _reboot_wireless_network(config.wifi_interface, next_step);
-                },
 
             ], callback);
         });

@@ -3,22 +3,20 @@
     "wifi_driver_type": "nl80211",
 
     "access_point": {
-        "force_reconfigure": true,
+        "force_reconfigure": false,
         "wifi_interface":    "wlan0",
-        "ssid":              "rpi-config-ap",
-        "passphrase":        "zzzzzzzz",
+        "ssid":              "IoT-Hub-Config",
+        "passphrase":        "123456z*",
         "domain":            "rpi.config",
-        "ip_addr":           "192.168.44.1",
+        "ip_addr":           "192.168.88.1",
         "netmask":           "255.255.255.0",
-        "subnet_ip":         "192.168.44.0",
-        "broadcast_address": "192.168.44.255",
-        "subnet_range": {
-            "start":         "192.168.44.10",
-            "end":           "192.168.44.50"
-        }
+        "subnet_ip":         "192.168.88.0",
+        "broadcast_address": "192.168.88.255",
+        "subnet_range_start": "192.168.88.100",
+        "subnet_range_end": "192.168.88.200"
     },
 
     "server": {
-        "port": 88
+        "port": 8888
     }
 }

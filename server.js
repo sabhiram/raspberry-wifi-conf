@@ -23,8 +23,8 @@ async.series([
     // 1. Check if we have the required dependencies installed
     function test_deps(next_step) {
         dependency_manager.check_deps({
-            "binaries": ["dhcpd", "hostapd", "iw"],
-            "files":    ["/etc/init.d/isc-dhcp-server"]
+            "binaries": ["dnsmasq", "hostapd", "iw"],
+            "files":    ["/etc/dnsmasq.conf"]
         }, function(error) {
             if (error) console.log(" * Dependency error, did you run `sudo npm run-script provision`?");
             next_step(error);
@@ -34,6 +34,8 @@ async.series([
     // 2. Check if wifi is enabled / connected
     function test_is_wifi_enabled(next_step) {
         wifi_manager.is_wifi_enabled(function(error, result_ip) {
+			console.log(result_ip);
+			/*
             if (result_ip) {
                 console.log("\nWifi is enabled, and IP " + result_ip + " assigned");
                 var reconfigure = config.access_point.force_reconfigure || false;
@@ -45,10 +47,11 @@ async.series([
             } else {
                 console.log("\nWifi is not enabled, Enabling AP for self-configure");
             }
-            next_step(error);
+            next_step(error);*/
         });
     },
-
+    
+/*
     // 3. Turn RPI into an access point
     function enable_rpi_ap(next_step) {
         wifi_manager.enable_ap_mode(config.access_point.ssid, function(error) {
@@ -68,7 +71,8 @@ async.series([
     function start_http_server(next_step) {
         console.log("\nHTTP server running...");
         require("./app/api.js")(wifi_manager, next_step);
-    },
+    },*/
+    
 
 ], function(error) {
     if (error) {

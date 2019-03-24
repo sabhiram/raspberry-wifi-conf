@@ -115,10 +115,11 @@ module.exports = function() {
     _is_wifi_enabled_sync = function(info) {
         // If we are not an AP, and we have a valid
         // inet_addr - wifi is enabled!
-        console.log(info["inet_addr"]);
+        //console.log(_is_ap_enabled_sync(info));
         if (null        == _is_ap_enabled_sync(info) &&
             "<unknown>" != info["inet_addr"]         &&
-            "<unknown>" == info["unassociated"] ) {
+            "Not-Associated" != info["ap_addr"] &&
+            "<unknown_ap>" != info["ap_addr"]  ) {
             return info["inet_addr"];
         }
         return null;
@@ -213,13 +214,6 @@ module.exports = function() {
                     });
                 },
 
-				function restart_dnsmasq_service(next_step) {
-                    exec("sudo systemctl restart dnsmasq", function(error, stdout, stderr) {
-                        if (!error) console.log("... dnsmasq server restarted!");
-                        else console.log("... dnsmasq server failed! - " + stdout);
-                        next_step();
-                    });
-                },
                 
                 function reboot_network_interfaces(next_step) {
                     _reboot_wireless_network(config.wifi_interface, next_step);
@@ -229,6 +223,14 @@ module.exports = function() {
                     exec("sudo systemctl restart hostapd", function(error, stdout, stderr) {
                         //console.log(stdout);
                         if (!error) console.log("... hostapd restarted!");
+                        next_step();
+                    });
+                },
+                
+                function restart_dnsmasq_service(next_step) {
+                    exec("sudo systemctl restart dnsmasq", function(error, stdout, stderr) {
+                        if (!error) console.log("... dnsmasq server restarted!");
+                        else console.log("... dnsmasq server failed! - " + stdout);
                         next_step();
                     });
                 },

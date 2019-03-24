@@ -1,6 +1,8 @@
 # raspberry-wifi-conf
 
-A Node application which makes connecting your RaspberryPi to your home wifi easier
+A Node application which makes connecting your RaspberryPi to your home wifi easier.
+
+Tested on Stretch and Raspberrt Pi 3
 
 ## Why?
 
@@ -8,7 +10,7 @@ When unable to connect to a wifi network, this service will turn the RPI into a 
 
 Once configured, it prompts the PI to reboot with the appropriate wifi credentials. If this process fails, it immediately re-enables the PI as an AP which can be configurable again.
 
-This project broadly follows these [instructions](http://www.maketecheasier.com/set-up-raspberry-pi-as-wireless-access-point/) in setting up a RaspberryPi as a wireless AP.
+This project broadly follows these [instructions](https://www.raspberrypi.org/documentation/configuration/wireless/access-point.md) in setting up a RaspberryPi as a wireless AP.
 
 ## Requirements
 
@@ -29,20 +31,6 @@ $sudo npm run-script provision
 $sudo npm start
 ```
 
-Now lets check to see if you have `dhcpcd` installed on your os, if you do - we have one more small step.
-
-Run `which dhcpcd` on your pi, if this returns any string (like `/sbin/dhcpcd`) then we need to add one line to the `dhcpcd.conf` file asking it to ignore the wireless interface that we are using for the AP.
-
-Add this to the very begenning of `/etc/dhcpcd.conf` (substitute your wifi interface for wlan0):
-```
-denyinterfaces wlan0
-```
-
-If you are into quick one-liners you can do this to prepend the line to the file.
-
-```
-echo "denyinterfaces wlan0" | cat - /etc/dhcpcd.conf > /tmp/out && sudo mv /tmp/out /etc/dhcpcd.conf
-```
 
 ## Setup the app as a service
 
@@ -121,13 +109,3 @@ Step 3: Select your home (or whatever) network, punch in the wifi passcode if an
 
 ## Testing
 
-TODO
-
-## TODO
-
-1. Automate the deployment of alternate `hostapd` application
-2. Automate provisioning of the application dependencies
-3. Make the running of scripts cleaner and more easy to read
-4. ifup should never be allowed to fail... same w/ the "start" pieces of various services. Perhaps we need to tease the restart into stop and start and allow the stop to fail.
-5. Add tests
-6. Add travis ci / coveralls hook(s)

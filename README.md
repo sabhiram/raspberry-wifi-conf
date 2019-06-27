@@ -2,6 +2,10 @@
 
 A Node application which makes connecting your RaspberryPi to your home wifi easier
 
+## RPI 4 Note:
+
+I realize that a bunch of folks will try this out using the shiny new RaspberryPi v4. I caution you that this is not something I have tried, I believe this was tested on a Pi3 to success. However, if you find that this works on a Pi4, please let me know and I will adjust the readme accordingly. If it does not work, it is probably a few PRs away from success :)
+
 ## Why?
 
 When unable to connect to a wifi network, this service will turn the RPI into a wireless AP. This allows us to connect to it via a phone or other device and configure our home wifi network (for example).

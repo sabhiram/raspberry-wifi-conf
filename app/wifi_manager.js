@@ -206,35 +206,14 @@ module.exports = function() {
                         context, next_step);
                 },
 
-                function restart_dhcp_service(next_step) {
-                    exec("sudo systemctl restart dhcpcd", function(error, stdout, stderr) {
-                        if (!error) console.log("... dhcpcd server restarted!");
-                        else console.log("... dhcpcd server failed! - " + stdout);
+                // Run bash script to enable the right services
+                function setup_access_point_services(next_step){
+                    exec("sudo ./assets/bash_scripts/setup_ap.sh", function(error, stdout, stderr) {
+                        if (!error) console.log("... access point services enabled succesfully!");
+                        else console.log("... failed to setup access point services! - " + stdout);
                         next_step();
                     });
-                },
-
-                
-                function reboot_network_interfaces(next_step) {
-                    _reboot_wireless_network(config.wifi_interface, next_step);
-                },
-
-                function restart_hostapd_service(next_step) {
-                    exec("sudo systemctl restart hostapd", function(error, stdout, stderr) {
-                        //console.log(stdout);
-                        if (!error) console.log("... hostapd restarted!");
-                        next_step();
-                    });
-                },
-                
-                function restart_dnsmasq_service(next_step) {
-                    exec("sudo systemctl restart dnsmasq", function(error, stdout, stderr) {
-                        if (!error) console.log("... dnsmasq server restarted!");
-                        else console.log("... dnsmasq server failed! - " + stdout);
-                        next_step();
-                    });
-                },
-                
+                }
 
             ], callback);
         });
@@ -285,34 +264,15 @@ module.exports = function() {
                         connection_info, next_step);
                 },
 
-				function restart_dnsmasq_service(next_step) {
-                    exec("sudo systemctl stop dnsmasq", function(error, stdout, stderr) {
-                        if (!error) console.log("... dnsmasq server stopped!");
-                        else console.log("... dnsmasq server failed! - " + stdout);
+                // Run bash script to enable the right services
+				function setup_wifi_mode_services(next_step) {
+                    exec("sudo ./assets/bash_scripts/setup_wifi.sh", function(error, stdout, stderr) {
+                        if (!error) console.log("... wifi mode services enabled succesfully!");
+                        else console.log("... failed to setup wifi mode services! - " + stdout);
                         next_step();
                     });
                 },
                 
-                function restart_hostapd_service(next_step) {
-                    exec("sudo systemctl stop hostapd", function(error, stdout, stderr) {
-                        //console.log(stdout);
-                        if (!error) console.log("... hostapd stopped!");
-                        next_step();
-                    });
-                },
-                
-                function restart_dhcp_service(next_step) {
-                    exec("sudo systemctl restart dhcpcd", function(error, stdout, stderr) {
-                        if (!error) console.log("... dhcpcd server restarted!");
-                        else console.log("... dhcpcd server failed! - " + stdout);
-                        next_step();
-                    });
-                },
-
-                function reboot_network_interfaces(next_step) {
-                    _reboot_wireless_network(config.wifi_interface, next_step);
-                },
-
             ], callback);
         });
 

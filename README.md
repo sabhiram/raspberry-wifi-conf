@@ -18,19 +18,17 @@ This project broadly follows these [instructions](https://www.raspberrypi.org/do
 
 ## Requirements
 
-The NodeJS modules required are pretty much just `underscore`, `async`, and `express`. 
+The NodeJS modules required are pretty much just `underscore`, `async`, and `express` for the backend.
 
-The web application requires `angular` and `font-awesome` to render correctly. To make the deployment of this easy, one of the other requirements is `bower`.
-
-If you do not have `bower` installed already, you can install it globally by running: `sudo npm install bower -g`.
+The web application requires `angular` and `font-awesome` to render correctly. To make the deployment of this easy, both of them are configured 
+in the package.json. (`bower` is not required as it was in previous versions of the project)
 
 ## Install
 
 ```sh
-$git clone https://github.com/sabhiram/raspberry-wifi-conf.git
+$git clone https://github.com/evyatarap/raspberry-wifi-conf.git
 $cd raspberry-wifi-conf
 $npm update
-$bower install
 $sudo npm run-script provision
 $sudo npm start
 ```

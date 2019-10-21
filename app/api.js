@@ -32,9 +32,10 @@ module.exports = function(wifi_manager, callback) {
     app.set("trust proxy", true);
 
     // Setup static routes to public assets
+    
     app.use(express.static(path.join(__dirname, "public")));
-    app.use("/node_modules/font-awesome", express.static(__dirname + "/node_modules/font-awesome"));
-    app.use("/node_modules/angular", express.static(__dirname + "/node_modules/angular"));
+    app.use("/node_modules/font-awesome", express.static(path.resolve(__dirname, '..') + "/node_modules/font-awesome"));
+    app.use("/node_modules/angular", express.static(path.resolve(__dirname, '..') + "/node_modules/angular"));
     app.use(bodyParser.json());
 
     // Setup HTTP routes for rendering views

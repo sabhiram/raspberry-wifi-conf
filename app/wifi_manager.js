@@ -222,7 +222,7 @@ module.exports = function () {
 
                     function restart_hostapd_service(next_step) {
                         exec("sudo start-stop-daemon --stop --exec /usr/local/bin/hostapd ; \
-                        sudo start-stop-daemon --start -b --exec /usr/local/bin/hostapd /usr/local/etc/hostapd.conf", function (error, stdout, stderr) {
+                        sudo start-stop-daemon --start -b --exec /usr/local/bin/hostapd /usr/local/etc/hostapd/hostapd.conf", function (error, stdout, stderr) {
                             //console.log(stdout);
                             if (!error) console.log("... hostapd restarted!");
                             next_step();

@@ -54,3 +54,5 @@ slaac private
 # fallback to static profile on eth0
 #interface eth0
 #fallback static_eth0
+
+denyinterfaces eth0

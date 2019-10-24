@@ -55,6 +55,8 @@ slaac private
 #interface eth0
 #fallback static_eth0
 
+denyinterfaces eth0
+
 interface {{ wifi_interface }}
     static ip_address={{ ip_addr }}/24
     nohook wpa_supplicant

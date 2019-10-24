@@ -300,14 +300,14 @@ module.exports = function () {
                         exec("sudo start-stop-daemon --stop --exec /usr/local/bin/hostapd", function (error, stdout, stderr) {
                             //console.log(stdout);
                             if (!error) console.log("... hostapd stopped!");
+                            else console.log("... hostapd server failed! - " + stdout);
                             next_step();
                         });
                     },
 
                     function restart_dhcp_service(next_step) {
-                        exec("sudo start-stop-daemon --stop --exec /usr/local/sbin/dhcpcd ; \
-                        sudo start-stop-daemon --start -b --exec /usr/local/sbin/dhcpcd -- -f /usr/local/etc/dhcpcd.conf", function (error, stdout, stderr) {
-                            if (!error) console.log("... dhcpcd server restarted!");
+                        exec("sudo start-stop-daemon --stop --exec /usr/local/sbin/dhcpcd", function (error, stdout, stderr) {
+                            if (!error) console.log("... dhcpcd server stopped!");
                             else console.log("... dhcpcd server failed! - " + stdout);
                             next_step();
                         });

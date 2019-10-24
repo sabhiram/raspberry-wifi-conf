@@ -1,7 +1,7 @@
 {
-  "name": "raspberry-wifi-conf",
+  "name": "rpi-picore-wifi-conf",
   "version": "0.0.1",
-  "description": "Node RPI Wifi Configuration Application",
+  "description": "Node RPI PiCore Wifi Configuration Application",
   "main": "server.js",
   "scripts": {
     "test": "npm test",
@@ -19,12 +19,15 @@
     "Node",
     "Wifi"
   ],
-  "author": "Shaba Abhiram",
+  "author": "Alan Mosely",
+  "contributors": [
+    "Shaba Abhiram (author of raspberry-wifi-conf)"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/sabhiram/raspberry-wifi-conf/issues"
+    "url": "https://github.com/alanmosely/rpi-picore-wifi-conf/issues"
   },
-  "homepage": "https://github.com/sabhiram/raspberry-wifi-conf",
+  "homepage": "https://github.com/alanmosely/rpi-picore-wifi-conf",
   "dependencies": {
     "async": "^0.9.2",
     "body-parser": "^1.18.2",

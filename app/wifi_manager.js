@@ -169,35 +169,53 @@ module.exports = function () {
                 async.series([
                     // Enable the access point ip and netmask + static
                     // DHCP for the wireless interface
-                    function update_interfaces(next_step) {
+                    function update_dhcpcd_conf(next_step) {
                         (async () => {
-                            await moveFile("/usr/local/etc/dhcpcd.conf", "/usr/local/etc/dhcpcd.bak");
-                            console.log("dhcpcd.bak created");
+                            try {
+                                await moveFile("/usr/local/etc/dhcpcd.conf", "/usr/local/etc/dhcpcd.bak");
+                                console.log("dhcpcd.bak created");
+                            }
+                            catch (err) {
+                                // No existing file to backup
+                            }
+                            write_template_to_file(
+                                "./assets/etc/dhcpcd/dhcpcd.ap.template",
+                                "/usr/local/etc/dhcpcd.conf",
+                                context, next_step);
+                            console.log("dhcpcd.conf created");
                         })();
-                        write_template_to_file(
-                            "./assets/etc/dhcpcd/dhcpcd.ap.template",
-                            "/usr/local/etc/dhcpcd.conf",
-                            context, next_step);
                     },
-                    function update_dhcp_interface(next_step) {
+                    function update_dnsmasq_conf(next_step) {
                         (async () => {
-                            await moveFile("/usr/local/etc/dnsmasq.conf", "/usr/local/etc/dnsmasq.bak");
-                            console.log("dnsmasq.bak created");
+                            try {
+                                await moveFile("/usr/local/etc/dnsmasq.conf", "/usr/local/etc/dnsmasq.bak");
+                                console.log("dnsmasq.bak created");
+                            }
+                            catch (err) {
+                                // No existing file to backup
+                            }
+                            write_template_to_file(
+                                "./assets/etc/dnsmasq/dnsmasq.ap.template",
+                                "/usr/local/etc/dnsmasq.conf",
+                                context, next_step);
+                            console.log("dnsmasq.conf created");
                         })();
-                        write_template_to_file(
-                            "./assets/etc/dnsmasq/dnsmasq.ap.template",
-                            "/usr/local/etc/dnsmasq.conf",
-                            context, next_step);
                     },
                     function update_hostapd_conf(next_step) {
                         (async () => {
-                            await moveFile("/usr/local/etc/hostapd.conf", "/usr/local/etc/hostapd.bak");
-                            console.log("hostapd.bak created");
+                            try {
+                                await moveFile("/usr/local/etc/hostapd.conf", "/usr/local/etc/hostapd.bak");
+                                console.log("hostapd.bak created");
+                            }
+                            catch (err) {
+                                // No existing file to backup
+                            }
+                            write_template_to_file(
+                                "./assets/etc/hostapd/hostapd.conf.template",
+                                "/usr/local/etc/hostapd.conf",
+                                context, next_step);
+                            console.log("hostapd.conf created");
                         })();
-                        write_template_to_file(
-                            "./assets/etc/hostapd/hostapd.conf.template",
-                            "/usr/local/etc/hostapd.conf",
-                            context, next_step);
                     },
                     function restart_dhcp_service(next_step) {
                         exec("sudo start-stop-daemon --stop --exec /usr/local/sbin/dhcpcd ; \
@@ -245,21 +263,27 @@ module.exports = function () {
                     //Add new network
                     function update_wpa_supplicant(next_step) {
                         (async () => {
-                            await moveFile("/usr/local/etc/wpa_supplicant.conf", "/usr/local/etc/wpa_supplicant.bak");
-                            console.log("wpa_supplicant.bak created");
+                            try {
+                                await moveFile("/usr/local/etc/wpa_supplicant.conf", "/usr/local/etc/wpa_supplicant.bak");
+                                console.log("wpa_supplicant.bak created");
+                            }
+                            catch (err) {
+                                // No existing file to backup
+                            }
+                            write_template_to_file(
+                                "./assets/etc/wpa_supplicant/wpa_supplicant.conf.template",
+                                "/usr/local/etc/wpa_supplicant.conf",
+                                context, next_step);
+                            console.log("wpa_supplicant.conf created");
                         })();
-                        write_template_to_file(
-                            "./assets/etc/wpa_supplicant/wpa_supplicant.conf.template",
-                            "/usr/local/etc/wpa_supplicant.conf",
-                            connection_info, next_step);
                     },
-                    function update_interfaces(next_step) {
+                    function update_dhcpcd_conf(next_step) {
                         write_template_to_file(
                             "./assets/etc/dhcpcd/dhcpcd.station.template",
                             "/usr/local/etc/dhcpcd.conf",
                             connection_info, next_step);
                     },
-                    function update_dhcp_interface(next_step) {
+                    function update_dnsmasq_conf(next_step) {
                         write_template_to_file(
                             "./assets/etc/dnsmasq/dnsmasq.station.template",
                             "/usr/local/etc/dnsmasq.conf",

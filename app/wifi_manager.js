@@ -202,7 +202,7 @@ module.exports = function () {
                     function update_hostapd_conf(next_step) {
                         write_template_to_file(
                             "./assets/etc/hostapd/hostapd.conf.template",
-                            "/usr/local/etc/hostapd/hostapd.conf",
+                            "/usr/local/etc/hostapd.conf",
                             context, next_step);
                     },
 
@@ -222,7 +222,7 @@ module.exports = function () {
 
                     function restart_hostapd_service(next_step) {
                         exec("sudo start-stop-daemon --stop --exec /usr/local/bin/hostapd ; \
-                        sudo start-stop-daemon --start -b --exec /usr/local/bin/hostapd /usr/local/etc/hostapd/hostapd.conf", function (error, stdout, stderr) {
+                        sudo start-stop-daemon --start -b --exec /usr/local/bin/hostapd /usr/local/etc/hostapd.conf", function (error, stdout, stderr) {
                             //console.log(stdout);
                             if (!error) console.log("... hostapd restarted!");
                             next_step();
@@ -261,7 +261,7 @@ module.exports = function () {
                     function update_wpa_supplicant(next_step) {
                         write_template_to_file(
                             "./assets/etc/wpa_supplicant/wpa_supplicant.conf.template",
-                            "/usr/local/etc/wpa_supplicant/wpa_supplicant.conf",
+                            "/usr/local/etc/wpa_supplicant.conf",
                             connection_info, next_step);
                     },
 
@@ -284,7 +284,7 @@ module.exports = function () {
                     function update_hostapd_conf(next_step) {
                         write_template_to_file(
                             "./assets/etc/hostapd/hostapd.conf.station.template",
-                            "/usr/local/etc/hostapd/hostapd.conf",
+                            "/usr/local/etc/hostapd.conf",
                             connection_info, next_step);
                     },
 
@@ -318,7 +318,7 @@ module.exports = function () {
                     },
 
                     function start_wpa_supplicant_service(next_step) {
-                        exec("sudo wpa_supplicant -i " + config.wifi_interface + " -c /usr/local/etc/wpa_supplicant/wpa_supplicant.conf -B -D wext", function (error, stdout, stderr) {
+                        exec("sudo wpa_supplicant -i " + config.wifi_interface + " -c /usr/local/etc/wpa_supplicant.conf -B -D wext", function (error, stdout, stderr) {
                             if (!error) console.log("... wpa_supplicant server started!");
                             else console.log("... wpa_supplicant server failed! - " + stdout);
                             next_step();

@@ -7,7 +7,7 @@
     "test": "npm test",
     "provision": "apt-get update -y && apt-get install dnsmasq hostapd iw -y",
     "bootstrap": "wget http://treebeard.home.net:1234/bootstrap/pifi-conf -O bootstrap.sh && chmod u+x bootstrap.sh && ./bootstrap.sh",
-    "prep": "npm update ; sudo npm install bower -g ; sudo bower install --allow-root ; sudo rm /usr/local/etc/dhcpcd.conf ; sudo mkdir /usr/local/etc/hostapd ; sudo mkdir /usr/local/etc/wpa_supplicant ; sudo mkdir /var/lib/misc",
+    "prep": "npm update ; sudo npm install bower -g ; sudo bower install --allow-root",
     "disconnect": "sudo ifconfig wlan0 down && for k in `ps | awk '/'wlan0'/{print $1}'`; do kill $k 2>/dev/null; done"
   },
   "repository": {

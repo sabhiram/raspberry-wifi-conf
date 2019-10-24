@@ -318,7 +318,7 @@ module.exports = function () {
                     },
 
                     function start_wpa_supplicant_service(next_step) {
-                        exec("sudo wpa_supplicant -i " + config.wifi_interface + " -c /usr/local/etc/wpa_supplicant/wpa_supplicant.conf -B -D wext >/dev/null 2>&1", function (error, stdout, stderr) {
+                        exec("sudo wpa_supplicant -i " + config.wifi_interface + " -c /usr/local/etc/wpa_supplicant/wpa_supplicant.conf -B -D wext", function (error, stdout, stderr) {
                             if (!error) console.log("... wpa_supplicant server started!");
                             else console.log("... wpa_supplicant server failed! - " + stdout);
                             next_step();
@@ -326,7 +326,7 @@ module.exports = function () {
                     },
 
                     function start_udhcpc_service(next_step) {
-                        exec("sudo udhcpc -n -i " + config.wifi_interface + " -x hostname: sleepysloth 2>/dev/null", function (error, stdout, stderr) {
+                        exec("sudo udhcpc -n -i " + config.wifi_interface + " -x hostname: sleepysloth", function (error, stdout, stderr) {
                             if (!error) console.log("... udhcpc server started!");
                             else console.log("... udhcpc server failed! - " + stdout);
                             next_step();

@@ -1,6 +1,7 @@
 var _ = require("underscore")._,
     async = require("async"),
     fs = require("fs"),
+    moveFile = require("move-file"),
     exec = require("child_process").exec,
     config = require("../config.json");
 
@@ -10,20 +11,16 @@ _.templateSettings = {
     evaluate: /\{\[([\s\S]+?)\]\}/g
 };
 
-// Helper function to write a given template to a file based on a given
-// context
+// Helper function to write a given template to a file based on a given context
 function write_template_to_file(template_path, file_name, context, callback) {
     async.waterfall([
-
         function read_template_file(next_step) {
             fs.readFile(template_path, { encoding: "utf8" }, next_step);
         },
-
         function update_file(file_txt, next_step) {
             var template = _.template(file_txt);
             fs.writeFile(file_name, template(context), next_step);
         }
-
     ], callback);
 }
 
@@ -39,8 +36,6 @@ module.exports = function () {
         }
     });
 
-    // Hack: this just assumes that the outbound interface will be "wlan0"
-
     // Define some globals
     var ifconfig_fields = {
         "hw_addr": /HWaddr\s([^\s]+)/,
@@ -50,8 +45,6 @@ module.exports = function () {
         "ap_ssid": /ESSID:\"([^\"]+)\"/,
         "unassociated": /(unassociated)\s+Nick/,
     }, last_wifi_info = null;
-
-    // TODO: rpi-config-ap hardcoded, should derive from a constant
 
     // Get generic info on an interface
     var _get_wifi_info = function (callback) {
@@ -63,8 +56,7 @@ module.exports = function () {
             unassociated: "<unknown>",
         };
 
-        // Inner function which runs a given command and sets a bunch
-        // of fields
+        // Inner function which runs a given command and sets a bunch of fields
         function run_command_and_set_fields(cmd, fields, callback) {
             exec(cmd, function (error, stdout, stderr) {
                 if (error) return callback(error);
@@ -83,10 +75,10 @@ module.exports = function () {
         // Run a bunch of commands and aggregate info
         async.series([
             function run_ifconfig(next_step) {
-                run_command_and_set_fields("ifconfig wlan0", ifconfig_fields, next_step);
+                run_command_and_set_fields("ifconfig " + config.wifi_interface, ifconfig_fields, next_step);
             },
             function run_iwconfig(next_step) {
-                run_command_and_set_fields("iwconfig wlan0", iwconfig_fields, next_step);
+                run_command_and_set_fields("iwconfig " + config.wifi_interface, iwconfig_fields, next_step);
             },
         ], function (error) {
             last_wifi_info = output;
@@ -134,17 +126,13 @@ module.exports = function () {
 
         // Access Point related functions
         _is_ap_enabled_sync = function (info) {
-
             var is_ap = info["ap_ssid"] == config.access_point.ssid;
-
             if (is_ap == true) {
                 return info["ap_ssid"];
             }
             else {
-
                 return null;
             }
-
         },
 
         _is_ap_enabled = function (callback) {
@@ -179,73 +167,72 @@ module.exports = function () {
 
                 // Here we need to actually follow the steps to enable the ap
                 async.series([
-
                     // Enable the access point ip and netmask + static
-                    // DHCP for the wlan0 interface
+                    // DHCP for the wireless interface
                     function update_interfaces(next_step) {
+                        (async () => {
+                            await moveFile("/usr/local/etc/dhcpcd.conf", "/usr/local/etc/dhcpcd.bak");
+                            console.log("dhcpcd.bak created");
+                        })();
                         write_template_to_file(
                             "./assets/etc/dhcpcd/dhcpcd.ap.template",
                             "/usr/local/etc/dhcpcd.conf",
                             context, next_step);
                     },
-
-
-                    // Enable the interface in the dhcp server
                     function update_dhcp_interface(next_step) {
+                        (async () => {
+                            await moveFile("/usr/local/etc/dnsmasq.conf", "/usr/local/etc/dnsmasq.bak");
+                            console.log("dnsmasq.bak created");
+                        })();
                         write_template_to_file(
                             "./assets/etc/dnsmasq/dnsmasq.ap.template",
                             "/usr/local/etc/dnsmasq.conf",
                             context, next_step);
                     },
-
-                    // Enable hostapd.conf file
                     function update_hostapd_conf(next_step) {
+                        (async () => {
+                            await moveFile("/usr/local/etc/hostapd.conf", "/usr/local/etc/hostapd.bak");
+                            console.log("hostapd.bak created");
+                        })();
                         write_template_to_file(
                             "./assets/etc/hostapd/hostapd.conf.template",
                             "/usr/local/etc/hostapd.conf",
                             context, next_step);
                     },
-
                     function restart_dhcp_service(next_step) {
                         exec("sudo start-stop-daemon --stop --exec /usr/local/sbin/dhcpcd ; \
-                        sudo start-stop-daemon --start -b --exec /usr/local/sbin/dhcpcd -- -f /usr/local/etc/dhcpcd.conf", function (error, stdout, stderr) {
+                        sudo start-stop-daemon --start --exec /usr/local/sbin/dhcpcd -- -f /usr/local/etc/dhcpcd.conf", function (error, stdout, stderr) {
                             if (!error) console.log("... dhcpcd server restarted!");
                             else console.log("... dhcpcd server failed! - " + stdout);
                             next_step();
                         });
                     },
-
-
                     function reboot_network_interfaces(next_step) {
                         _reboot_wireless_network(config.wifi_interface, next_step);
                     },
-
                     function restart_hostapd_service(next_step) {
                         exec("sudo start-stop-daemon --stop --exec /usr/local/bin/hostapd ; \
-                        sudo start-stop-daemon --start -b --exec /usr/local/bin/hostapd /usr/local/etc/hostapd.conf", function (error, stdout, stderr) {
-                            //console.log(stdout);
+                        sudo start-stop-daemon --start --exec /usr/local/bin/hostapd /usr/local/etc/hostapd.conf", function (error, stdout, stderr) {
                             if (!error) console.log("... hostapd restarted!");
+                            else console.log("... hostapd server failed! - " + stdout);
                             next_step();
                         });
                     },
-
                     function restart_dnsmasq_service(next_step) {
                         exec("sudo start-stop-daemon --stop --exec /usr/local/sbin/dnsmasq ; \
-                        sudo start-stop-daemon --start -b --exec /usr/local/sbin/dnsmasq -- -C /usr/local/etc/dnsmasq.conf", function (error, stdout, stderr) {
+                        sudo mkdir /var/lib/misc ; \
+                        sudo start-stop-daemon --start --exec /usr/local/sbin/dnsmasq -- -C /usr/local/etc/dnsmasq.conf", function (error, stdout, stderr) {
                             if (!error) console.log("... dnsmasq server restarted!");
                             else console.log("... dnsmasq server failed! - " + stdout);
                             next_step();
                         });
                     },
-
-
                 ], callback);
             });
         },
 
         // Disables AP mode and reverts to wifi connection
         _enable_wifi_mode = function (connection_info, callback) {
-
             _is_wifi_enabled(function (error, result_ip) {
                 if (error) return callback(error);
 
@@ -255,39 +242,35 @@ module.exports = function () {
                 }
 
                 async.series([
-
-
                     //Add new network
                     function update_wpa_supplicant(next_step) {
+                        (async () => {
+                            await moveFile("/usr/local/etc/wpa_supplicant.conf", "/usr/local/etc/wpa_supplicant.bak");
+                            console.log("wpa_supplicant.bak created");
+                        })();
                         write_template_to_file(
                             "./assets/etc/wpa_supplicant/wpa_supplicant.conf.template",
                             "/usr/local/etc/wpa_supplicant.conf",
                             connection_info, next_step);
                     },
-
                     function update_interfaces(next_step) {
                         write_template_to_file(
                             "./assets/etc/dhcpcd/dhcpcd.station.template",
                             "/usr/local/etc/dhcpcd.conf",
                             connection_info, next_step);
                     },
-
-                    // Enable the interface in the dhcp server
                     function update_dhcp_interface(next_step) {
                         write_template_to_file(
                             "./assets/etc/dnsmasq/dnsmasq.station.template",
                             "/usr/local/etc/dnsmasq.conf",
                             connection_info, next_step);
                     },
-
-                    // Enable hostapd.conf file
                     function update_hostapd_conf(next_step) {
                         write_template_to_file(
                             "./assets/etc/hostapd/hostapd.conf.station.template",
                             "/usr/local/etc/hostapd.conf",
                             connection_info, next_step);
                     },
-
                     function stop_dnsmasq_service(next_step) {
                         exec("sudo start-stop-daemon --stop --exec /usr/local/sbin/dnsmasq", function (error, stdout, stderr) {
                             if (!error) console.log("... dnsmasq server stopped!");
@@ -295,16 +278,13 @@ module.exports = function () {
                             next_step();
                         });
                     },
-
                     function stop_hostapd_service(next_step) {
                         exec("sudo start-stop-daemon --stop --exec /usr/local/bin/hostapd", function (error, stdout, stderr) {
-                            //console.log(stdout);
                             if (!error) console.log("... hostapd stopped!");
                             else console.log("... hostapd server failed! - " + stdout);
                             next_step();
                         });
                     },
-
                     function stop_dhcp_service(next_step) {
                         exec("sudo start-stop-daemon --stop --exec /usr/local/sbin/dhcpcd", function (error, stdout, stderr) {
                             if (!error) console.log("... dhcpcd server stopped!");
@@ -312,11 +292,9 @@ module.exports = function () {
                             next_step();
                         });
                     },
-
                     function reboot_network_interfaces(next_step) {
                         _reboot_wireless_network(config.wifi_interface, next_step);
                     },
-
                     function start_wpa_supplicant_service(next_step) {
                         exec("sudo wpa_supplicant -i " + config.wifi_interface + " -c /usr/local/etc/wpa_supplicant.conf -B -D wext", function (error, stdout, stderr) {
                             if (!error) console.log("... wpa_supplicant server started!");
@@ -324,7 +302,6 @@ module.exports = function () {
                             next_step();
                         });
                     },
-
                     function start_udhcpc_service(next_step) {
                         exec("sudo udhcpc -n -i " + config.wifi_interface + " -x hostname: sleepysloth", function (error, stdout, stderr) {
                             if (!error) console.log("... udhcpc server started!");
@@ -332,7 +309,6 @@ module.exports = function () {
                             next_step();
                         });
                     },
-
                 ], callback);
             });
 

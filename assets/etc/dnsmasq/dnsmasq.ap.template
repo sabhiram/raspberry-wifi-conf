@@ -1,3 +1,3 @@
 interface={{ wifi_interface }}      # Use the require wireless interface - usually wlan0
   dhcp-range={{ subnet_range_start }},{{ subnet_range_end }},{{ netmask }},24h
-no-dhcp-interface=eth0
+  no-dhcp-interface=eth0

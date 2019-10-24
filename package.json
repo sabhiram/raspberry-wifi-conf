@@ -8,7 +8,7 @@
     "provision": "apt-get update -y && apt-get install dnsmasq hostapd iw -y",
     "bootstrap": "wget http://treebeard.home.net:1234/bootstrap/pifi-conf -O bootstrap.sh && chmod u+x bootstrap.sh && ./bootstrap.sh",
     "prep": "npm update ; sudo npm install bower -g ; sudo bower install --allow-root",
-    "disconnect": "sudo ifconfig wlan0 down && for k in `ps | awk '/'wlan0'/{print $1}'`; do kill $k 2>/dev/null; done"
+    "disconnect-wlan0": "sudo ifconfig wlan0 down && for k in `ps | awk '/'wlan0'/{print $1}'`; do kill $k 2>/dev/null; done ; sudo ifconfig wlan0 up"
   },
   "repository": {
     "type": "git",
@@ -16,6 +16,7 @@
   },
   "keywords": [
     "RaspberryPi",
+    "PiCore",
     "Node",
     "Wifi"
   ],
@@ -33,6 +34,7 @@
     "body-parser": "^1.18.2",
     "ejs": "^2.5.9",
     "express": "^4.16.3",
+    "move-file": "^1.2.0",
     "underscore": "^1.9.0"
   }
 }

@@ -5,10 +5,9 @@
   "main": "server.js",
   "scripts": {
     "test": "npm test",
-    "provision": "apt-get update -y && apt-get install dnsmasq hostapd iw -y",
-    "bootstrap": "wget http://treebeard.home.net:1234/bootstrap/pifi-conf -O bootstrap.sh && chmod u+x bootstrap.sh && ./bootstrap.sh",
-    "prep": "npm update ; sudo npm install bower -g ; sudo bower install --allow-root",
-    "disconnect-wlan0": "sudo ifconfig wlan0 down && for k in `ps | awk '/'wlan0'/{print $1}'`; do kill $k 2>/dev/null; done ; sudo ifconfig wlan0 up"
+    "provision": "tce-load -wi dhcpcd.tcz hostapd.tcz dnsmasq.tcz iw.tcz node.tcz",
+    "prep": "npm update ; npm install bower -g ; bower install --allow-root",
+    "disconnect-wlan0": "ifconfig wlan0 down && for k in `ps | awk '/'wlan0'/{print $1}'`; do kill $k 2>/dev/null; done ; ifconfig wlan0 up"
   },
   "repository": {
     "type": "git",

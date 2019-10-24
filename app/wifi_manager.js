@@ -288,7 +288,7 @@ module.exports = function () {
                             connection_info, next_step);
                     },
 
-                    function restart_dnsmasq_service(next_step) {
+                    function stop_dnsmasq_service(next_step) {
                         exec("sudo start-stop-daemon --stop --exec /usr/local/sbin/dnsmasq", function (error, stdout, stderr) {
                             if (!error) console.log("... dnsmasq server stopped!");
                             else console.log("... dnsmasq server failed! - " + stdout);
@@ -296,7 +296,7 @@ module.exports = function () {
                         });
                     },
 
-                    function restart_hostapd_service(next_step) {
+                    function stop_hostapd_service(next_step) {
                         exec("sudo start-stop-daemon --stop --exec /usr/local/bin/hostapd", function (error, stdout, stderr) {
                             //console.log(stdout);
                             if (!error) console.log("... hostapd stopped!");
@@ -305,7 +305,7 @@ module.exports = function () {
                         });
                     },
 
-                    function restart_dhcp_service(next_step) {
+                    function stop_dhcp_service(next_step) {
                         exec("sudo start-stop-daemon --stop --exec /usr/local/sbin/dhcpcd", function (error, stdout, stderr) {
                             if (!error) console.log("... dhcpcd server stopped!");
                             else console.log("... dhcpcd server failed! - " + stdout);
@@ -315,6 +315,22 @@ module.exports = function () {
 
                     function reboot_network_interfaces(next_step) {
                         _reboot_wireless_network(config.wifi_interface, next_step);
+                    },
+
+                    function start_wpa_supplicant_service(next_step) {
+                        exec("sudo wpa_supplicant -i " + config.wifi_interface + " -c /usr/local/etc/wpa_supplicant/wpa_supplicant.conf -B -D wext >/dev/null 2>&1", function (error, stdout, stderr) {
+                            if (!error) console.log("... wpa_supplicant server started!");
+                            else console.log("... wpa_supplicant server failed! - " + stdout);
+                            next_step();
+                        });
+                    },
+
+                    function start_udhcpc_service(next_step) {
+                        exec("sudo udhcpc -n -i " + config.wifi_interface + " -x hostname: sleepysloth 2>/dev/null", function (error, stdout, stderr) {
+                            if (!error) console.log("... udhcpc server started!");
+                            else console.log("... udhcpc server failed! - " + stdout);
+                            next_step();
+                        });
                     },
 
                 ], callback);

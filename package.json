@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npm test",
     "provision": "tce-load -wi dhcpcd.tcz hostapd.tcz dnsmasq.tcz iw.tcz node.tcz",
-    "upgrade-node": "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | sh ; export NVM_DIR=\"$HOME/.nvm\" ; [ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\" ; nvm install --lts",
+    "upgrade-node": "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | sh ; unset npm_config_prefix ; export NVM_DIR=\"$HOME/.nvm\" ; [ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\" ; nvm install 8.16.2",
     "prep": "npm update ; npm install bower -g ; bower install --allow-root",
     "disconnect-wlan0": "ifconfig wlan0 down && for k in `ps | awk '/'wlan0'/{print $1}'`; do kill $k 2>/dev/null; done ; ifconfig wlan0 up"
   },

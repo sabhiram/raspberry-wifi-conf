@@ -198,6 +198,15 @@ module.exports = function() {
                         context, next_step);
                 },
 
+                // Set the default path to the hostapd configuration file
+                function clear_dhcpcd_default_settings(next_step) {
+                    write_template_to_file(
+                        "./assets/etc/hostapd/hostapd.default.conf.ap",
+                        "/etc/default/hostapd",
+                        connection_info, next_step);
+                },
+
+
                 // Enable hostapd.conf file
                 function update_hostapd_conf(next_step) {
                     write_template_to_file(
@@ -233,7 +242,7 @@ module.exports = function() {
             async.series([
             
 				
-				//Add new network
+				// Add new network
 				function update_wpa_supplicant(next_step) {
                     write_template_to_file(
                         "./assets/etc/wpa_supplicant/wpa_supplicant.conf.template",
@@ -241,10 +250,19 @@ module.exports = function() {
                         connection_info, next_step);
 				},
 
+                // Disable the static ip address configured by the dhcpcd service
                 function update_interfaces(next_step) {
                     write_template_to_file(
                         "./assets/etc/dhcpcd/dhcpcd.station.template",
                         "/etc/dhcpcd.conf",
+                        connection_info, next_step);
+                },
+
+                // Clear dhcpcd default configuration file
+                function clear_dhcpcd_default_settings(next_step) {
+                    write_template_to_file(
+                        "./assets/etc/hostapd/hostapd.default.conf.clear",
+                        "/etc/default/hostapd",
                         connection_info, next_step);
                 },
 

@@ -218,7 +218,7 @@ module.exports = function () {
                         })();
                     },
                     function restart_dhcp_service(next_step) {
-                        exec("sudo start-stop-daemon --stop --exec /usr/local/sbin/dhcpcd ; \
+                        exec("sudo start-stop-daemon --stop --exec /usr/local/sbin/dhcpcd ; sleep 1 ; \
                         sudo start-stop-daemon --start --exec /usr/local/sbin/dhcpcd -- -f /usr/local/etc/dhcpcd.conf", function (error, stdout, stderr) {
                             if (!error) console.log("... dhcpcd server restarted!");
                             else console.log("... dhcpcd server failed! - " + stdout);
@@ -229,15 +229,15 @@ module.exports = function () {
                         _reboot_wireless_network(config.wifi_interface, next_step);
                     },
                     function restart_hostapd_service(next_step) {
-                        exec("sudo start-stop-daemon --stop --exec /usr/local/bin/hostapd ; \
-                        sudo start-stop-daemon --start --exec /usr/local/bin/hostapd /usr/local/etc/hostapd.conf", function (error, stdout, stderr) {
+                        exec("sudo start-stop-daemon --stop --exec /usr/local/bin/hostapd ; sleep 1 ; \
+                        sudo start-stop-daemon --start -b --exec /usr/local/bin/hostapd /usr/local/etc/hostapd.conf", function (error, stdout, stderr) {
                             if (!error) console.log("... hostapd restarted!");
                             else console.log("... hostapd server failed! - " + stdout);
                             next_step();
                         });
                     },
                     function restart_dnsmasq_service(next_step) {
-                        exec("sudo start-stop-daemon --stop --exec /usr/local/sbin/dnsmasq ; \
+                        exec("sudo start-stop-daemon --stop --exec /usr/local/sbin/dnsmasq ; sleep 1 ; \
                         sudo mkdir /var/lib/misc ; \
                         sudo start-stop-daemon --start --exec /usr/local/sbin/dnsmasq -- -C /usr/local/etc/dnsmasq.conf", function (error, stdout, stderr) {
                             if (!error) console.log("... dnsmasq server restarted!");
@@ -273,7 +273,7 @@ module.exports = function () {
                             write_template_to_file(
                                 "./assets/etc/wpa_supplicant/wpa_supplicant.conf.template",
                                 "/usr/local/etc/wpa_supplicant.conf",
-                                context, next_step);
+                                connection_info, next_step);
                             console.log("wpa_supplicant.conf created");
                         })();
                     },

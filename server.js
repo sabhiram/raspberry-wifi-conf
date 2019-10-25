@@ -2,7 +2,6 @@ var async               = require("async"),
     wifi_manager        = require("./app/wifi_manager")(),
     dependency_manager  = require("./app/dependency_manager")(),
     config              = require("./config.json");
-
 /*****************************************************************************\
     1. Check for dependencies
     2. Check to see if we are connected to a wifi AP
@@ -43,7 +42,7 @@ async.series([
                 } else {
                     process.exit(0);
                 }
-            } else {
+            } else if (config.access_point.auto_ap_mode){
                 console.log("\nWifi is not enabled, Enabling AP for self-configure");
             }
             next_step(error);

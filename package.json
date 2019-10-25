@@ -10,7 +10,7 @@
     "upgrade-node": "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | sh ; npm run set-nvm ; npm run unset-npms ; nvm install 8.16.2 ; npm run set-nvm",
     "prep": "npm update ; npm install bower -g ; bower install --allow-root",
     "disconnect-wlan0": "ifconfig wlan0 down && for k in `ps | awk '/'wlan0'/{print $1}'`; do kill $k 2>/dev/null; done ; ifconfig wlan0 up",
-    "full-setup": "run-s upgrade-node prep disconnect-wlan0",
+    "full-setup": "npm run upgrade-node && npm run prep && npm run disconnect-wlan0",
     "test": "npm test"
   },
   "repository": {

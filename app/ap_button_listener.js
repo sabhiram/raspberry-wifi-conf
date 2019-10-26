@@ -1,10 +1,9 @@
 
 var Gpio            = require('onoff').Gpio,
     config          = require("../config.json"),
-    wifi_manager    = require("./app/wifi_manager")(),
     async           = require("async");
 
-module.exports = function() {
+module.exports = function(wifi_manager) {
     
     const btn_Wifi = new Gpio(config.access_point.physical_button.pin, 'in', 'rising', {debounceTimeout: 10});
 

@@ -2,7 +2,7 @@ var async               = require("async"),
     wifi_manager        = require("./app/wifi_manager")(),
     dependency_manager  = require("./app/dependency_manager")(),
     config              = require("./config.json"),
-    ap_btn_listener     = require("./app/ap_button_listener")();
+    ap_btn_listener     = require("./app/ap_button_listener")(wifi_manager);
 
 /*****************************************************************************\
     1. Check for dependencies

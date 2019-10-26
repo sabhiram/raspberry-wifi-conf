@@ -62,6 +62,6 @@ module.exports = function() {
 
     return {
         start:           _start,
-        start:           _stop,
+        stop:           _stop
     };
 }

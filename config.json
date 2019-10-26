@@ -1,12 +1,16 @@
 {
+    "version": "1.1.0",
     "wifi_interface": "wlan0",
     "wifi_driver_type": "nl80211",
 
     "access_point": {
         "force_reconfigure": false,
         "auto_ap_mode": false,
-        "physical_button_enabled": true,
-        "physical_button_pin": 4,
+        "physical_button":{
+            "enabled": true,
+            "pin": 5,
+            "timeout": 10
+        },
         "wifi_interface":    "wlan0",
         "ssid":              "rpi-config-ap",
         "passphrase":        "123456z*",

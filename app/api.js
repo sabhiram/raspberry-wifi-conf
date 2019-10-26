@@ -71,7 +71,7 @@ module.exports = function(wifi_manager, callback) {
             }
             // Success! - exit
             console.log("Wifi Enabled! - Stopping http server.");
-            server.stop();
+            server.close();
         });
     });
 

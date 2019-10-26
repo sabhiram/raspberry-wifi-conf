@@ -1,7 +1,9 @@
 var async               = require("async"),
     wifi_manager        = require("./app/wifi_manager")(),
     dependency_manager  = require("./app/dependency_manager")(),
-    config              = require("./config.json");
+    config              = require("./config.json"),
+    Gpio                = require('onoff').Gpio;
+
 /*****************************************************************************\
     1. Check for dependencies
     2. Check to see if we are connected to a wifi AP
@@ -17,6 +19,64 @@ var async               = require("async"),
     7. At this stage, the RPI is named, and has a valid wifi connection which
        its bound to, reboot the pi and re-run this script on startup.
 \*****************************************************************************/
+
+console.log("Service started");
+
+
+const btn_Wifi = new Gpio(5, 'in', 'rising', {debounceTimeout: 10});
+
+const TIMEOUT_BTN_WIFI = 10
+count_btnWifiClick = 0;
+timer_btnWifi = setInterval(listenToWifiResetButton, 1000);
+
+function listenToWifiResetButton() {
+    var btnValue = btn_Wifi.readSync();
+    if(btnValue == 1){
+        count_btnWifiClick = 0;
+    }else{
+        count_btnWifiClick++;
+        if(count_btnWifiClick == TIMEOUT_BTN_WIFI){
+            console.log("Reseting WiFi now!");
+
+            async.series([
+                // 1. Turn RPI into an access point
+                function enable_rpi_ap(next_step) {
+                    wifi_manager.enable_ap_mode(config.access_point.ssid, function(error) {
+                        if(error) {
+                            console.log("... AP Enable ERROR: " + error);
+                        } else {
+                            console.log("... AP Enable Success!");
+                        }
+                        next_step(error);
+                    });
+                },
+
+                // 2. Host HTTP server while functioning as AP, the "api.js"
+                //    file contains all the needed logic to get a basic express
+                //    server up. It uses a small angular application which allows
+                //    us to choose the wifi of our choosing.
+                function start_http_server(next_step) {
+                    console.log("\nHTTP server running...");
+                    require("./app/api.js")(wifi_manager, next_step);
+                },
+                
+            ], function(error) {
+                if (error) {
+                    console.log("ERROR: " + error);
+                }
+            });
+
+            count_btnWifiClick = 0;
+        }
+    }
+}
+
+process.on('SIGINT', _ => {
+    btn_Wifi.unexport();
+    clearInterval(timer_btnWifi)
+});
+
+
 async.series([
 
     // 1. Check if we have the required dependencies installed
@@ -39,9 +99,10 @@ async.series([
                 var reconfigure = config.access_point.force_reconfigure || false;
                 if (reconfigure) {
                     console.log("\nForce reconfigure enabled - try to enable access point");
-                } else {
-                    process.exit(0);
+                }else{
+                    return;
                 }
+
             } else if (config.access_point.auto_ap_mode){
                 console.log("\nWifi is not enabled, Enabling AP for self-configure");
             }
@@ -76,3 +137,4 @@ async.series([
         console.log("ERROR: " + error);
     }
 });
+

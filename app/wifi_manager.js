@@ -203,7 +203,7 @@ module.exports = function() {
                     write_template_to_file(
                         "./assets/etc/hostapd/hostapd.default.conf.ap",
                         "/etc/default/hostapd",
-                        connection_info, next_step);
+                        context, next_step);
                 },
 
 

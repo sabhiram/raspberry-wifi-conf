@@ -1,6 +1,7 @@
 
 var Gpio    = require('onoff').Gpio,
-    config  = require("../config.json");
+    config  = require("../config.json"),
+    async   = require("async");
 
 module.exports = function() {
     

@@ -1,7 +1,8 @@
 
-var Gpio    = require('onoff').Gpio,
-    config  = require("../config.json"),
-    async   = require("async");
+var Gpio            = require('onoff').Gpio,
+    config          = require("../config.json"),
+    wifi_manager    = require("./app/wifi_manager")(),
+    async           = require("async");
 
 module.exports = function() {
     

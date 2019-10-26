@@ -40,7 +40,7 @@ module.exports = function(wifi_manager) {
                         //    us to choose the wifi of our choosing.
                         function start_http_server(next_step) {
                             console.log("\nHTTP server running...");
-                            require("./app/api.js")(wifi_manager, next_step);
+                            require("../app/api.js")(wifi_manager, next_step);
                         },
                         
                     ], function(error) {

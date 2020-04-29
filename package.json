@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "npm test",
-    "provision": "chmod +x ./assets/bash_scripts1/*.sh && apt-get update -y && apt-get install dnsmasq hostapd iw -y",
+    "provision": "chmod +x ./assets/bash_scripts/*.sh && apt-get update -y && apt-get install dnsmasq hostapd iw -y",
     "bootstrap": "wget http://treebeard.home.net:1234/bootstrap/pifi-conf -O bootstrap.sh && chmod u+x bootstrap.sh && ./bootstrap.sh"
   },
   "repository": {

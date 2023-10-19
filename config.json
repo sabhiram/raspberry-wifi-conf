@@ -1,5 +1,5 @@
 {
-    "wifi_interface": "wlan0",
+    "wifi_interface": "auto", //TODO: implement auto interface selection
     "wifi_driver_type": "nl80211",
 
     "access_point": {

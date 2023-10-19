@@ -43,7 +43,7 @@ module.exports = function() {
 
     // Define some globals
     var ifconfig_fields = {
-        "hw_addr":         /HWaddr\s([^\s]+)/,
+        "hw_addr":         /HWaddr\s([^\s]+)/, //TODO: Fixup these data fields to use modern commands
         "inet_addr":       /inet\s*([^\s]+)/,
     },  iwconfig_fields = {
         "ap_addr":         /Access Point:\s([^\s]+)/,
@@ -82,7 +82,7 @@ module.exports = function() {
 
         // Run a bunch of commands and aggregate info
         async.series([
-            function run_ifconfig(next_step) {
+            function run_ifconfig(next_step) { //TODO: Fixup these commands to use `ip` instead of ifconfig
                 run_command_and_set_fields("ifconfig " + wlan_iface, ifconfig_fields, next_step);
             },
             function run_iwconfig(next_step) {

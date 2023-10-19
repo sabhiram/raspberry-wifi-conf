@@ -4,6 +4,7 @@
 
     "access_point": {
         "force_reconfigure": false,
+        "server_fqdn":       "lumi.config",
         "ssid_prefix":       "lumi-",
         "ssid":              "",
         "passphrase":        "123456z*",
@@ -17,6 +18,6 @@
     },
 
     "server": {
-        "port": 8888
+        "port": 80
     }
 }

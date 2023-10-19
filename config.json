@@ -1,13 +1,13 @@
 {
-    "wifi_interface": "auto", //TODO: implement auto interface selection
+    "wifi_interface": "auto",
     "wifi_driver_type": "nl80211",
 
     "access_point": {
         "force_reconfigure": false,
-        "wifi_interface":    "wlan0",
-        "ssid":              "rpi-config-ap",
+        "ssid_prefix":       "lumi-",
+        "ssid":              "",
         "passphrase":        "123456z*",
-        "domain":            "rpi.config",
+        "domain":            "lumi.config",
         "ip_addr":           "192.168.88.1",
         "netmask":           "255.255.255.0",
         "subnet_ip":         "192.168.88.0",

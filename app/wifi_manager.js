@@ -39,19 +39,32 @@ module.exports = function() {
         }
     });
 
-    // Hack: this just assumes that the outbound interface will be "wlan0"
-
     // Define some globals
     var ifconfig_fields = {
-        "hw_addr":         /HWaddr\s([^\s]+)/, //TODO: Fixup these data fields to use modern commands
-        "inet_addr":       /inet\s*([^\s]+)/,
+        "hw_addr":         /ether\s([^\s]+)/,
+        "inet_addr":       /inet\s*([^\s\/]+)/,
     },  iwconfig_fields = {
         "ap_addr":         /Access Point:\s([^\s]+)/,
         "ap_ssid":         /ESSID:\"([^\"]+)\"/,
-        "unassociated":    /(unassociated)\s+Nick/,
-    },  last_wifi_info = null;
-
-    // TODO: rpi-config-ap hardcoded, should derive from a constant
+        "unassociated":    /(unassociated)\s+ESSID/,
+    },  last_wifi_info = null,
+        available_wifi_interfaces = [];
+    
+    // TODO: Split this up?
+    // Detect which wifi interface we should use, if not specified
+    exec("find -H /sys/class/net/* -name phy80211 -maxdepth 2 | cut -d/ -f5", function(error, stdout) {
+        var interface_array = stdout.split("\n");
+        if (interface_array.length > 0) {
+            available_wifi_interfaces = interface_array;
+            // Allow "auto" or empty to trigger auto selection
+            if (!config.wifi_interface || config.wifi_interface.toLowerCase() == "auto") {
+                // default to first available wireless interface, revisit if necessary.
+                config.wifi_interface = available_wifi_interfaces[0];
+            };
+        } else {
+            console.log("No wireless devices found");
+        }
+    });
 
     // Get generic info on an interface
     var _get_wifi_info = function(callback) {
@@ -82,11 +95,27 @@ module.exports = function() {
 
         // Run a bunch of commands and aggregate info
         async.series([
-            function run_ifconfig(next_step) { //TODO: Fixup these commands to use `ip` instead of ifconfig
-                run_command_and_set_fields("ifconfig " + wlan_iface, ifconfig_fields, next_step);
+            function run_ifconfig(next_step) {
+                run_command_and_set_fields("ip a show dev " + wlan_iface, ifconfig_fields, next_step);
             },
             function run_iwconfig(next_step) {
                 run_command_and_set_fields("iwconfig " + wlan_iface, iwconfig_fields, next_step);
+            },
+            function generate_ap_ssid(next_step) {
+                // Derive ap ssid from prefix and mac address if unset
+                if ((typeof config.access_point.ssid == 'undefined') || !config.access_point.ssid) { //no ap ssid set, create one
+                    // configure a prefix for generated ssid, default to "config"
+                    var ssid_prefix = (typeof config.ssid_prefix !== 'undefined')
+                        ? config.ssid_prefix
+                        : "config-"; // default prefix if not set
+                    
+                    var mac_octets = output.hw_addr.split(":");
+                    var mac_len = mac_octets.length;
+
+                    config.access_point.ssid = (mac_len == 6)
+                        ? config.ssid_prefix + mac_octets[4] + mac_octets[5] // use the last two octets for a short unique-ish identifier
+                        : config.ssid_prefix; // dunno what we got for a mac address, but it ain't right
+                };
             },
         ], function(error) {
             last_wifi_info = output;
@@ -95,16 +124,16 @@ module.exports = function() {
     },
 
     _reboot_wireless_network = function(wlan_iface, callback) {
-        async.series([
+        async.series([ // ip link set DEV up|down
             function down(next_step) {
-                exec("sudo ifconfig " + wlan_iface + " down", function(error, stdout, stderr) {
-                    if (!error) console.log("ifconfig " + wlan_iface + " down successful...");
+                exec("sudo ip link set " + wlan_iface + " down", function(error, stdout, stderr) {
+                    if (!error) console.log("link " + wlan_iface + " down successful...");
                     next_step();
                 });
             },
             function up(next_step) {
-                exec("sudo ifconfig " + wlan_iface + " up", function(error, stdout, stderr) {
-                    if (!error) console.log("ifconfig " + wlan_iface + " up successful...");
+                exec("sudo ip link set " + wlan_iface + " up", function(error, stdout, stderr) {
+                    if (!error) console.log("link " + wlan_iface + " up successful...");
                     next_step();
                 });
             },

@@ -96,17 +96,18 @@ module.exports = function() {
         // Run a bunch of commands and aggregate info
         async.series([
             function run_ifconfig(next_step) {
-                run_command_and_set_fields("ip a show dev " + wlan_iface, ifconfig_fields, next_step);
+                run_command_and_set_fields("ip a show dev " + config.wifi_interface, ifconfig_fields, next_step);
             },
             function run_iwconfig(next_step) {
-                run_command_and_set_fields("iwconfig " + wlan_iface, iwconfig_fields, next_step);
+                run_command_and_set_fields("iwconfig " + config.wifi_interface, iwconfig_fields, next_step);
             },
             function generate_ap_ssid(next_step) {
                 // Derive ap ssid from prefix and mac address if unset
                 if ((typeof config.access_point.ssid == 'undefined') || !config.access_point.ssid) { //no ap ssid set, create one
+                    console.log("generating ap ssid...");
                     // configure a prefix for generated ssid, default to "config"
                     var ssid_prefix = (typeof config.ssid_prefix !== 'undefined')
-                        ? config.ssid_prefix
+                        ? config.access_point.ssid_prefix
                         : "config-"; // default prefix if not set
                     
                     var mac_octets = output.hw_addr.split(":");
@@ -115,7 +116,9 @@ module.exports = function() {
                     config.access_point.ssid = (mac_len == 6)
                         ? config.ssid_prefix + mac_octets[4] + mac_octets[5] // use the last two octets for a short unique-ish identifier
                         : config.ssid_prefix; // dunno what we got for a mac address, but it ain't right
+                    console.log("ap: " + config.access_point.ssid);
                 };
+                next_step(null);
             },
         ], function(error) {
             last_wifi_info = output;
@@ -205,6 +208,7 @@ module.exports = function() {
             var context = config.access_point;
             context["enable_ap"] = true;
             context["wifi_driver_type"] = config.wifi_driver_type;
+            context["wifi_interface"] = config.wifi_interface;
 
             // Here we need to actually follow the steps to enable the ap
             async.series([

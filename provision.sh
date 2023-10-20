@@ -6,4 +6,5 @@ apt-get install -qq dnsmasq hostapd iw dhcpcd nodejs npm
 npm update --quiet
 npm install bower -g --quiet
 bower install --allow-root
-apt remove --purge -qq NetworkManager
+apt-get remove --purge -qq network-manager
+apt-get autoremove -qq

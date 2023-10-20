@@ -9,3 +9,8 @@ npm install bower -g --quiet
 bower install --allow-root
 apt-get remove --purge -qq network-manager
 apt-get autoremove -qq
+mkdir -p /opt/armbian-wifi-conf
+cp -r * /opt/armbian-wifi-conf
+cp assets/init.d/armbian-wifi-conf.service /lib/systemd/system/
+systemctl daemon-reload
+systemctl enable armbian-wifi-conf

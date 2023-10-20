@@ -212,7 +212,6 @@ module.exports = function() {
 
             // Here we need to actually follow the steps to enable the ap
             async.series([
-
                 // Enable the access point ip and netmask + static
                 // DHCP for the wlan0 interface
                 function update_interfaces(next_step) {
@@ -221,7 +220,6 @@ module.exports = function() {
                         "/etc/dhcpcd.conf",
                         context, next_step);
                 },
-
 
                 // Enable the interface in the dhcp server
                 function update_dhcp_interface(next_step) {
@@ -291,7 +289,7 @@ module.exports = function() {
 				function update_wpa_supplicant(next_step) {
                     write_template_to_file(
                         "./assets/etc/wpa_supplicant/wpa_supplicant.conf.template",
-                        "/etc/wpa_supplicant/wpa_supplicant.conf",
+                        "/etc/wpa_supplicant/wpa_supplicant-" + connection_info.wifi_interface + ".conf",
                         connection_info, next_step);
 				},
 
@@ -339,6 +337,23 @@ module.exports = function() {
                         if (!error) console.log("... dhcpcd server restarted!");
                         else console.log("... dhcpcd server failed! - " + stdout);
                         next_step();
+                    });
+                },
+
+                function enable_systemd_wpa_supplicant_service(next_step) {
+                    exec("systemctl enable wpa_supplicant@" + connection_info.wifi_interface + ".service", function(error, stdout, stderr) {
+                        if (!error) {
+                            console.log("Systemd service enabled for " + connection_info.wifi_interface + "!");
+                        };
+                        next_step(null);
+                    });
+                },
+                function start_systemd_wpa_supplicant_service(next_step) {
+                    exec("systemctl start wpa_supplicant@" + connection_info.wifi_interface + ".service", function (error, stdout, stderr) {
+                        if (!error) {
+                            console.log("Systemd service started for " + connection_info.wifi_interface + "!");
+                        };
+                        next_step(null);
                     });
                 },
 

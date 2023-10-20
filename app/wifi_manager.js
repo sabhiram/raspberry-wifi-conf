@@ -129,13 +129,13 @@ module.exports = function() {
     _reboot_wireless_network = function(wlan_iface, callback) {
         async.series([ // ip link set DEV up|down
             function down(next_step) {
-                exec("sudo ip link set " + wlan_iface + " down", function(error, stdout, stderr) {
+                exec("ip link set " + wlan_iface + " down", function(error, stdout, stderr) {
                     if (!error) console.log("link " + wlan_iface + " down successful...");
                     next_step();
                 });
             },
             function up(next_step) {
-                exec("sudo ip link set " + wlan_iface + " up", function(error, stdout, stderr) {
+                exec("ip link set " + wlan_iface + " up", function(error, stdout, stderr) {
                     if (!error) console.log("link " + wlan_iface + " up successful...");
                     next_step();
                 });
@@ -238,7 +238,7 @@ module.exports = function() {
                 },
 
                 function restart_dhcp_service(next_step) {
-                    exec("sudo systemctl restart dhcpcd", function(error, stdout, stderr) {
+                    exec("systemctl restart dhcpcd", function(error, stdout, stderr) {
                         if (!error) console.log("... dhcpcd server restarted!");
                         else console.log("... dhcpcd server failed! - " + stdout);
                         next_step();
@@ -251,7 +251,7 @@ module.exports = function() {
                 },
 
                 function restart_hostapd_service(next_step) {
-                    exec("sudo systemctl restart hostapd", function(error, stdout, stderr) {
+                    exec("systemctl restart hostapd", function(error, stdout, stderr) {
                         //console.log(stdout);
                         if (!error) console.log("... hostapd restarted!");
                         next_step();
@@ -259,7 +259,7 @@ module.exports = function() {
                 },
                 
                 function restart_dnsmasq_service(next_step) {
-                    exec("sudo systemctl restart dnsmasq", function(error, stdout, stderr) {
+                    exec("systemctl restart dnsmasq", function(error, stdout, stderr) {
                         if (!error) console.log("... dnsmasq server restarted!");
                         else console.log("... dnsmasq server failed! - " + stdout);
                         next_step();
@@ -284,16 +284,7 @@ module.exports = function() {
 
             async.series([
             
-				
-				//Add new network
-				function update_wpa_supplicant(next_step) {
-                    write_template_to_file(
-                        "./assets/etc/wpa_supplicant/wpa_supplicant.conf.template",
-                        "/etc/wpa_supplicant/wpa_supplicant-" + config.wifi_interface + ".conf",
-                        connection_info, next_step);
-				},
-
-                function update_interfaces(next_step) {
+				function update_interfaces(next_step) {
                     write_template_to_file(
                         "./assets/etc/dhcpcd/dhcpcd.station.template",
                         "/etc/dhcpcd.conf",
@@ -317,7 +308,7 @@ module.exports = function() {
                 },
 
 				function restart_dnsmasq_service(next_step) {
-                    exec("sudo systemctl stop dnsmasq", function(error, stdout, stderr) {
+                    exec("systemctl stop dnsmasq", function(error, stdout, stderr) {
                         if (!error) console.log("... dnsmasq server stopped!");
                         else console.log("... dnsmasq server failed! - " + stdout);
                         next_step();
@@ -325,7 +316,7 @@ module.exports = function() {
                 },
                 
                 function restart_hostapd_service(next_step) {
-                    exec("sudo systemctl stop hostapd", function(error, stdout, stderr) {
+                    exec("systemctl stop hostapd", function(error, stdout, stderr) {
                         //console.log(stdout);
                         if (!error) console.log("... hostapd stopped!");
                         next_step();
@@ -333,13 +324,24 @@ module.exports = function() {
                 },
                 
                 function restart_dhcp_service(next_step) {
-                    exec("sudo systemctl restart dhcpcd", function(error, stdout, stderr) {
+                    exec("systemctl restart dhcpcd", function(error, stdout, stderr) {
                         if (!error) console.log("... dhcpcd server restarted!");
                         else console.log("... dhcpcd server failed! - " + stdout);
                         next_step();
                     });
                 },
 
+                function reboot_network_interfaces(next_step) {
+                    _reboot_wireless_network(config.wifi_interface, next_step);
+                },
+
+				//Add new network
+				function update_wpa_supplicant(next_step) {
+                    write_template_to_file(
+                        "./assets/etc/wpa_supplicant/wpa_supplicant.conf.template",
+                        "/etc/wpa_supplicant/wpa_supplicant-" + config.wifi_interface + ".conf",
+                        connection_info, next_step);
+				},
                 function enable_systemd_wpa_supplicant_service(next_step) {
                     exec("systemctl enable wpa_supplicant@" + config.wifi_interface + ".service", function(error, stdout, stderr) {
                         if (!error) {
@@ -355,10 +357,6 @@ module.exports = function() {
                         };
                         next_step(null);
                     });
-                },
-
-                function reboot_network_interfaces(next_step) {
-                    _reboot_wireless_network(config.wifi_interface, next_step);
                 },
 
             ], callback);

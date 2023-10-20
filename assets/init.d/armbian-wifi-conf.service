@@ -2,7 +2,7 @@
 [Unit]
 Description=Armbian Wifi Config
 AssertPathExists=/opt/armbian-wifi-conf
-After=network.target
+After=wpa_supplicant@.service
 
 [Service]
 Type=oneshot

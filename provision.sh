@@ -3,6 +3,7 @@ echo Be patient, this is slow and as silent as I could make it...
 apt-get update -qq
 apt-get upgrade -qq
 apt-get install -qq dnsmasq hostapd iw dhcpcd nodejs npm
+systemctl unmask hostapd
 npm update --quiet
 npm install bower -g --quiet
 bower install --allow-root

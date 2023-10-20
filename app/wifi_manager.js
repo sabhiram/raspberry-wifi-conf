@@ -106,7 +106,7 @@ module.exports = function() {
                 if ((typeof config.access_point.ssid == 'undefined') || !config.access_point.ssid) { //no ap ssid set, create one
                     console.log("generating ap ssid...");
                     // configure a prefix for generated ssid, default to "config"
-                    var ssid_prefix = (typeof config.ssid_prefix !== 'undefined')
+                    var ssid_prefix = (typeof config.access_point.ssid_prefix !== 'undefined')
                         ? config.access_point.ssid_prefix
                         : "config-"; // default prefix if not set
                     
@@ -114,8 +114,8 @@ module.exports = function() {
                     var mac_len = mac_octets.length;
 
                     config.access_point.ssid = (mac_len == 6)
-                        ? config.ssid_prefix + mac_octets[4] + mac_octets[5] // use the last two octets for a short unique-ish identifier
-                        : config.ssid_prefix; // dunno what we got for a mac address, but it ain't right
+                        ? ssid_prefix + mac_octets[4] + mac_octets[5] // use the last two octets for a short unique-ish identifier
+                        : ssid_prefix; // dunno what we got for a mac address, but it ain't right
                     console.log("ap: " + config.access_point.ssid);
                 };
                 next_step(null);

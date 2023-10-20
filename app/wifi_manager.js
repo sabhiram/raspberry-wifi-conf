@@ -289,7 +289,7 @@ module.exports = function() {
 				function update_wpa_supplicant(next_step) {
                     write_template_to_file(
                         "./assets/etc/wpa_supplicant/wpa_supplicant.conf.template",
-                        "/etc/wpa_supplicant/wpa_supplicant-" + connection_info.wifi_interface + ".conf",
+                        "/etc/wpa_supplicant/wpa_supplicant-" + config.wifi_interface + ".conf",
                         connection_info, next_step);
 				},
 
@@ -341,17 +341,17 @@ module.exports = function() {
                 },
 
                 function enable_systemd_wpa_supplicant_service(next_step) {
-                    exec("systemctl enable wpa_supplicant@" + connection_info.wifi_interface + ".service", function(error, stdout, stderr) {
+                    exec("systemctl enable wpa_supplicant@" + config.wifi_interface + ".service", function(error, stdout, stderr) {
                         if (!error) {
-                            console.log("Systemd service enabled for " + connection_info.wifi_interface + "!");
+                            console.log("Systemd service enabled for " + config.wifi_interface + "!");
                         };
                         next_step(null);
                     });
                 },
                 function start_systemd_wpa_supplicant_service(next_step) {
-                    exec("systemctl start wpa_supplicant@" + connection_info.wifi_interface + ".service", function (error, stdout, stderr) {
+                    exec("systemctl start wpa_supplicant@" + config.wifi_interface + ".service", function (error, stdout, stderr) {
                         if (!error) {
-                            console.log("Systemd service started for " + connection_info.wifi_interface + "!");
+                            console.log("Systemd service started for " + config.wifi_interface + "!");
                         };
                         next_step(null);
                     });

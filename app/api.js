@@ -9,7 +9,7 @@ var path = require("path"),
     mqttLib = require('./mqtt'),
     request = require('request'),
     config = require("../config.json"),
-    exec    = require("child_process").exec,
+    exec = require("child_process").exec,
     http_test = config.http_test_only;
 
 // Helper function to log errors and send a generic status "SUCCESS"
@@ -142,23 +142,41 @@ module.exports = function(wifi_manager, callback) {
                 checkInternet(async function(isConnected) {
                     if (isConnected) {
                         const decoder = new util.TextDecoder('utf8');
-                        const topicPath = getDataTopicPath();
+                        const topicPath = mqttLib.getDataTopicPath();
                         console.info("topicPath", topicPath);
-                        await connectMQTT();
-                        const connection = getMQTTConnection();
+                        await mqttLib.connectMQTT();
+                        const connection = mqttLib.getMQTTConnection();
                         await connection.subscribe(topicPath, mqtt.QoS.AtLeastOnce, async (topic, payload, dup, qos, retain) => {
                             const json = decoder.decode(payload);
                             console.log(`Publish received. topic:"${topic}" dup:${dup} qos:${qos} retain:${retain}`);
                             console.log(`Payload: ${json}`);
                             try {
                                 const message = JSON.parse(json);
-                                // Get image from url, download it somewhere, display on hdmi
-                                // ffmpeg -i test-1-001.jpeg -pix_fmt bgra -s 1920x1080 -f fbdev /dev/fb0
-                                // exec(`ffmpeg -i /tmp/image001.jpg -pix_fmt bgra -s 1920x1080 -f fbdev /dev/fb0`, function(error, stdout, stderr) {
-                                //     if (stderr) {
-                                //         console.error("Error running in ffmpeg");
-                                //     }
-                                // });
+                                if (message.type === "prompt") {
+                                    console.info("Received prompt", message);
+                                } else if (message.type === "state") {
+                                    console.info("Received state", message);
+                                    // Get image from url, download it somewhere, display on hdmi
+                                    if (message.job.status === 'completed') {
+                                        if (message.resultImage.url) {
+                                            const imgPath = `/tmp/$(basename ${message.result.url})`;
+                                            console.info(`Downloading image to path ${imgPath}`);
+                                            // exec(`curl ${message.result.url} -o ${imgPath}`, function(error, stdout, stderr) {
+                                            //     if (stderr) {
+                                            //         console.error('Cant download image with curl');
+                                            //     }
+                                            // })
+                                            // ffmpeg -i test-1-001.jpeg -pix_fmt bgra -s 1920x1080 -f fbdev /dev/fb0
+                                            // exec(`ffmpeg -i ${imgPath} -pix_fmt bgra -s 1920x1080 -f fbdev /dev/fb0`, function(error, stdout, stderr) {
+                                            //     if (stderr) {
+                                            //         console.error("Error running in ffmpeg");
+                                            //     }
+                                            // });
+                                        }
+                                    }
+                                } else {
+                                    console.info("Received unknown message", json);
+                                }
                                 console.info("Parsed json", message);
                             }
                             catch (error) {

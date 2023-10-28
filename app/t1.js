@@ -71,7 +71,7 @@ async function main() {
       const message = JSON.parse(json);
       console.info("Parsed json", message);
       if (message.job && message.job.status && message.job.status == "completed") {
-        cdnUrl = message.sourceImage.url;
+        cdnUrl = message.resultImage.url;
         // download image to drive, e.g. /opt/lumibot/cache/$PROMPTID/$FILENAME
         var fileTarget = `/opt/illumibot/cache/${message.job.promptId}/`;
         await mkdir(fileTarget, { recursive: true });

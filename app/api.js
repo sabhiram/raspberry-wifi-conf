@@ -1,13 +1,16 @@
-var path       = require("path"),
-    util       = require("util"),
-    iwlist     = require("./iwlist"),
-    express    = require("express"),
+import { mqtt, iot, http } from 'aws-iot-device-sdk-v2';
+var path = require("path"),
+    util = require("util"),
+    iwlist = require("./iwlist"),
+    express = require("express"),
     bodyParser = require('body-parser'),
-    fs         = require("fs"),
-    dns        = require('dns'),
-    request    = require('request'),
-    config     = require("../config.json"),
-    http_test  = config.http_test_only;
+    fs = require("fs"),
+    dns = require('dns'),
+    mqttLib = require('./mqtt'),
+    request = require('request'),
+    config = require("../config.json"),
+    exec    = require("child_process").exec,
+    http_test = config.http_test_only;
 
 // Helper function to log errors and send a generic status "SUCCESS"
 // message to the caller
@@ -118,8 +121,8 @@ module.exports = function(wifi_manager, callback) {
 
     app.post("/api/enable_wifi", function(request, response) {
         var conn_info = {
-            wifi_ssid:      request.body.wifi_ssid,
-            wifi_passcode:  request.body.wifi_passcode,
+            wifi_ssid: request.body.wifi_ssid,
+            wifi_passcode: request.body.wifi_passcode,
         };
 
         // TODO: If wifi did not come up correctly, it should fail
@@ -136,9 +139,32 @@ module.exports = function(wifi_manager, callback) {
             // Success! - exit
             console.log("Wifi Enabled! - Exiting");
             setInterval(function() {
-                checkInternet(function(isConnected) {
+                checkInternet(async function(isConnected) {
                     if (isConnected) {
-                        
+                        const decoder = new util.TextDecoder('utf8');
+                        const topicPath = getDataTopicPath();
+                        console.info("topicPath", topicPath);
+                        await connectMQTT();
+                        const connection = getMQTTConnection();
+                        await connection.subscribe(topicPath, mqtt.QoS.AtLeastOnce, async (topic, payload, dup, qos, retain) => {
+                            const json = decoder.decode(payload);
+                            console.log(`Publish received. topic:"${topic}" dup:${dup} qos:${qos} retain:${retain}`);
+                            console.log(`Payload: ${json}`);
+                            try {
+                                const message = JSON.parse(json);
+                                // Get image from url, download it somewhere, display on hdmi
+                                // ffmpeg -i test-1-001.jpeg -pix_fmt bgra -s 1920x1080 -f fbdev /dev/fb0
+                                // exec(`ffmpeg -i /tmp/image001.jpg -pix_fmt bgra -s 1920x1080 -f fbdev /dev/fb0`, function(error, stdout, stderr) {
+                                //     if (stderr) {
+                                //         console.error("Error running in ffmpeg");
+                                //     }
+                                // });
+                                console.info("Parsed json", message);
+                            }
+                            catch (error) {
+                                console.log("Warning: Could not parse message as JSON...");
+                            }
+                        })
                     } else {
                         console.log('No internet connection');
                     }

@@ -39,7 +39,7 @@ async function download(fileUrl, dest) {
       response.pipe(file);
     });
 
-    request.on('finish', () => resolve(fileInfo));
+    request.on('finish', () => res(fileInfo));
 
     request.on('error', err => {
       fs.unlink(dest, () => {

@@ -61,8 +61,10 @@ function getStateTopicPath() {
 
 function getMQTTConnection() {
   if (!mqttConnection) {
-    console.info("reusing connection...");
+    console.info("Getting new MQTT connection...");
     mqttConnection = buildConnection(iotConfig);
+  } else {
+    console.info("Reusing MQTT connection...");
   }
   return mqttConnection;
 }
@@ -81,27 +83,6 @@ async function disconnectMQTT() {
   console.log("Disconnect completed.");
 }
 
-async function main() {
-  const decoder = new TextDecoder('utf8');
-  const topicPath = getDataTopicPath();
-  console.info("topicPath", topicPath);
-  // common_args.apply_sample_arguments(argv);
-  await connectMQTT();
-  const connection = getMQTTConnection();
-  await connection.subscribe(topicPath, mqtt.QoS.AtLeastOnce, async (topic, payload, dup, qos, retain) => {
-    const json = decoder.decode(payload);
-    console.log(`Publish received. topic:"${topic}" dup:${dup} qos:${qos} retain:${retain}`);
-    console.log(`Payload: ${json}`);
-    try {
-      const message = JSON.parse(json);
-      console.info("Parsed json", message);
-    }
-    catch (error) {
-      console.log("Warning: Could not parse message as JSON...");
-    }
-  })
-}
-
 module.exports = {
   getMachineId,
   getDataTopicPath,
@@ -110,8 +91,4 @@ module.exports = {
   connectMQTT,
   disconnectMQTT,
 };
-
-(async function() {
-  await main();
-})();
 

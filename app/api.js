@@ -86,6 +86,17 @@ module.exports = function(wifi_manager, callback) {
         });
     });
 
+    app.get("/api/machine_id", function(request, response) {
+        fs.readFile('/etc/machine-id', 'utf8', function(err, data) {
+            if (err) {
+                console.log('Error reading machineId:', err);
+                response.status(500).json({ error: 'Error reading machineId' });
+                return;
+            }
+            response.status(200).json({ id: data.trim() });
+        });
+    });
+
     app.post("/api/register_device", function(request, response) {
         console.log('Server got /register_device');
         const userId = request.body.user_id;

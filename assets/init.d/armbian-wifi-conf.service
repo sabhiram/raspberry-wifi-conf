@@ -1,0 +1,14 @@
+# armbian-wifi-conf.service
+[Unit]
+Description=Armbian Wifi Config
+AssertPathExists=/opt/armbian-wifi-conf
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/armbian-wifi-conf
+ExecStartPre=/bin/sleep 20
+ExecStart=/usr/bin/node server.js
+
+[Install]
+WantedBy=multi-user.target

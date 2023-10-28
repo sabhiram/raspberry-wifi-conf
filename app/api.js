@@ -3,6 +3,9 @@ var path       = require("path"),
     iwlist     = require("./iwlist"),
     express    = require("express"),
     bodyParser = require('body-parser'),
+    fs         = require("fs"),
+    dns        = require('dns'),
+    request    = require('request'),
     config     = require("../config.json"),
     http_test  = config.http_test_only;
 
@@ -18,6 +21,40 @@ function log_error_send_success_with(success_obj, error, response) {
         response.send(success_obj);
     }
     response.end();
+}
+
+function checkInternet(callback) {
+    dns.resolve('www.google.com', function(err) {
+        if (err) {
+            callback(false);
+        } else {
+            callback(true);
+        }
+    });
+}
+
+function sendJsonFile() {
+    fs.readFile('/tmp/userDeviceData.json', 'utf8', function(err, data) {
+        if (err) {
+            console.log('Error reading file:', err);
+            return;
+        }
+        const options = {
+            url: 'http://your-server-url.com/api/endpoint',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: data
+        };
+        request(options, function(error, response, body) {
+            if (error) {
+                console.log('Error sending file:', error);
+                return;
+            }
+            console.log('Successfully sent file');
+        });
+    });
 }
 
 /*****************************************************************************\
@@ -49,6 +86,25 @@ module.exports = function(wifi_manager, callback) {
         });
     });
 
+    app.post("/api/register_device", function(request, response) {
+        console.log('Server got /register_device');
+        const userId = request.body.user_id;
+        const deviceId = request.body.device_id;
+        const data = {
+            user_id: userId,
+            device_id: deviceId
+        };
+        fs.writeFile('/tmp/userDeviceData.json', JSON.stringify(data), (err) => {
+            if (err) {
+                console.log('Error writing file:', err);
+                response.status(500).send('Error writing file');
+            } else {
+                console.log('Successfully wrote file with data', data);
+                response.status(200).send('Successfully wrote file');
+            }
+        });
+    });
+
     app.post("/api/enable_wifi", function(request, response) {
         var conn_info = {
             wifi_ssid:      request.body.wifi_ssid,
@@ -68,7 +124,17 @@ module.exports = function(wifi_manager, callback) {
             }
             // Success! - exit
             console.log("Wifi Enabled! - Exiting");
-            process.exit(0);
+            setInterval(function() {
+                checkInternet(function(isConnected) {
+                    if (isConnected) {
+                        
+                    } else {
+                        console.log('No internet connection');
+                    }
+                });
+            }, 10000); // Check every 10 seconds
+            response.status(200).send('Wifi Enabled!');
+            // process.exit(0);
         });
     });
 

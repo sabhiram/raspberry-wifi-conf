@@ -81,6 +81,7 @@ async function main() {
     }
     catch (error) {
       console.log("Warning: Could not parse message as JSON...");
+      console.log(error);
     }
   })
 

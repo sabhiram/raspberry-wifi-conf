@@ -9,8 +9,9 @@ var path = require("path"),
     mqttLib = require('./mqtt'),
     request = require('request'),
     config = require("../config.json"),
-    exec = require("child_process").exec,
     http_test = config.http_test_only;
+
+const exec = util.promisify(require('child_process').exec);
 
 // Helper function to log errors and send a generic status "SUCCESS"
 // message to the caller
@@ -33,30 +34,6 @@ function checkInternet(callback) {
         } else {
             callback(true);
         }
-    });
-}
-
-function sendJsonFile() {
-    fs.readFile('/tmp/userDeviceData.json', 'utf8', function(err, data) {
-        if (err) {
-            console.log('Error reading file:', err);
-            return;
-        }
-        const options = {
-            url: 'http://your-server-url.com/api/endpoint',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: data
-        };
-        request(options, function(error, response, body) {
-            if (error) {
-                console.log('Error sending file:', error);
-                return;
-            }
-            console.log('Successfully sent file');
-        });
     });
 }
 
@@ -89,15 +66,26 @@ module.exports = function(wifi_manager, callback) {
         });
     });
 
-    app.get("/api/machine_id", function(request, response) {
-        fs.readFile('/etc/machine-id', 'utf8', function(err, data) {
-            if (err) {
-                console.log('Error reading machineId:', err);
-                response.status(500).json({ error: 'Error reading machineId' });
-                return;
-            }
-            response.status(200).json({ id: data.trim() });
-        });
+    app.get("/api/device_info", async function(request, response) {
+        try {
+            const machineId = await fs.promises.readFile('/etc/machine-id', 'utf8');
+            const { stdout: hostname } = await exec('hostname');
+            // const { stdout: deviceType } = await exec('cat /proc/device-tree/model');
+            // const { stdout: macAddress } = await exec('cat /sys/class/net/eth0/address');
+            // const { stdout: serialNumber } = await exec('cat /proc/cpuinfo | grep Serial | cut -d \' \' -f 2');
+            const { stdout: ssid } = await exec('grep "ssid=" /etc/hostapd/hostapd.conf | cut -d= -f2-');
+            const { stdout: bssid } = await exec('cat /sys/class/net/wl*/address');
+            response.status(200).json({
+                name: ssid.trim(),
+                hostname: hostname.trim(),
+                machine_id: machineId.trim(),
+                ssid: ssid.trim(),
+                bssid: bssid.trim()
+            });
+        } catch (err) {
+            console.log('Error:', err);
+            response.status(500).json({ error: 'Error getting device info' });
+        }
     });
 
     app.post("/api/register_device", function(request, response) {

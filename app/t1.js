@@ -1,5 +1,6 @@
 import { mqtt, iot, http } from 'aws-iot-device-sdk-v2';
 import * as mqttLib from './mqtt';
+import { mkdir } from 'node:fs/promises';
 var fs = require("fs"),
     https = require('https'),
     url = require('url'),
@@ -72,8 +73,11 @@ async function main() {
       if (message.job && message.job.status && message.job.status == "completed") {
         cdnUrl = message.sourceImage.url;
         // download image to drive, e.g. /opt/lumibot/cache/$PROMPTID/$FILENAME
+        var fileTarget = `/opt/illumibot/cache/${message.job.promptId}/`;
+        await mkdir(fileTarget, { recursive: true });
         var filenameFromUrl = getFileFromUrl(cdnUrl);
-        var fileTarget = `/opt/illumibot/cache/${message.job.promptId}/${filenameFromUrl}`;
+        fileTarget += filenameFromUrl;
+        console.log('downloading image...');
         await download(cdnUrl, fileTarget);
         console.log('displaying image...');
         exec(`ffmpeg -stream_loop -1 -i ${fileTarget} -pix_fmt bgra -f fbdev /dev/fb0`);

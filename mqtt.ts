@@ -76,9 +76,9 @@ async function main(argv: Args) {
 
 (async function() {
   await main({
-    cert: './illumibot.cert.pem',
-    key: './illumibot.private.key',
-    ca_file: './root-CA.crt',
+    cert: './assets/certs/illumibot.cert.pem',
+    key: './assets/certs/illumibot.private.key',
+    ca_file: './assets/certs/root-CA.crt',
     client_id: 'illumibot-4444',
     endpoint: 'a3if4p9wci5r3z-ats.iot.us-east-1.amazonaws.com',
   });
